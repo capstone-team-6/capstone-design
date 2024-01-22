@@ -1,13 +1,5 @@
 import { defineComponent, ref } from 'vue'
 
-{
-  /* <style scoped>
-.read-the-docs {
-  color: #888;
-}
-</style> */
-}
-
 export const HelloWorld = defineComponent({
   name: 'HelloWorld',
   props: {
@@ -50,9 +42,7 @@ export const HelloWorld = defineComponent({
           </a>
           in your IDE for a better DX
         </p>,
-        <p class="read-the-docs">
-          Click on the Vite and Vue logos to learn more
-        </p>
+        <p>Click on the Vite and Vue logos to learn more</p>
       ]
     }
   }

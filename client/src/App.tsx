@@ -2,23 +2,6 @@ import { defineComponent } from 'vue'
 import image from './assets/vue.svg'
 import { HelloWorld } from './components/HelloWorld'
 
-{
-  /* <style scoped>
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.vue:hover {
-  filter: drop-shadow(0 0 2em #42b883aa);
-}
-</style> */
-}
-
 export default defineComponent({
   name: 'App',
   setup () {
