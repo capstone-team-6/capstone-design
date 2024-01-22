@@ -10,5 +10,5 @@ module.exports = {
         parser: "@typescript-eslint/parser",
         sourceType: "module"
     },
-    plugins: []
+    plugins: ["vue", "@typescript-eslint"]
 }
