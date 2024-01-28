@@ -1,7 +1,11 @@
 import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
+import { assertEnv, loadDotEnv } from './configuration';
+import { AppModule } from './modules/app.module';
 
 async function bootstrap() {
+  loadDotEnv()
+  assertEnv()
+
   const app = await NestFactory.create(AppModule);
   await app.listen(3000);
 }
