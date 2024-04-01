@@ -42,3 +42,4 @@ jobs:
         with: 
           service: server
           image: docker.io/team6admin/server-image:latest
+          region: asia-northeast3
