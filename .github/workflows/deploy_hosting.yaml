@@ -22,3 +22,4 @@ jobs:
         with:
           firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_CAPSTONE_DESIGN_TEAM6_APP }}
           entryPoint: ./client
+          channelId: live
