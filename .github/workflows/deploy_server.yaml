@@ -5,6 +5,10 @@ on:
 
 jobs: 
   build_and_deploy:
+    permissions: 
+      contents: read
+      id-token: write
+
     name: Build and deploy
     runs-on: ubuntu-latest
     steps: 
@@ -20,10 +24,21 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build and push
+      - name: Build and push image
         uses: docker/build-push-action@v5
         with:
           context: ./server
           file: ./server/DockerFile
           push: true
           tags: team6admin/server-image:latest
+      
+      - name: Login to google github action
+        uses: google-github-actions/auth@v2
+        with: 
+          credentials_json: ${{ secrets.GOOGLE_CREDENTIALS }}
+        
+      - name: Deploy cloud run
+        uses: google-github-actions/deploy-cloudrun@v2
+        with: 
+          service: server
+          image: docker.io/team6admin/server-image:latest
