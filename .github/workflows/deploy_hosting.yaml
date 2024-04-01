@@ -18,7 +18,7 @@ jobs:
         run: cd client && npm ci && npm run build
         
       - name: Deploy
-        run: npm 
+        uses: FirebaseExtended/action-hosting-deploy@v0 
         with:
           firebaseServiceAccount: ${{ secrets.GOOGLE_CREDENTIALS }}
           entryPoint: ./client
