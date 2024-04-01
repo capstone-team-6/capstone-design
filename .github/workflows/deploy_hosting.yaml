@@ -13,9 +13,6 @@ jobs:
       
       - name: Setup node
         uses: actions/setup-node@v4
-      
-      - name: Install firebase tools
-        run: npm i -g firebase-tools
 
       - name: Build
         run: cd client && npm ci && npm run build
@@ -23,5 +20,5 @@ jobs:
       - name: Deploy
         uses: FirebaseExtended/action-hosting-deploy@v0 
         with:
-          firebaseServiceAccount: ${{ secrets.GOOGLE_CREDENTIALS }}
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_CAPSTONE_DESIGN_TEAM6_APP }}
           entryPoint: ./client
