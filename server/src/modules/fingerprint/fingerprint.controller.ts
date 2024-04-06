@@ -11,15 +11,15 @@ export class FingerprintController {
 
   @Post('register')
   async register(
-    @Body() body: FingerprintAPI['endpoints']['register']['body'],
-  ): Promise<FingerprintAPI['endpoints']['register']['response']> {
+    @Body() body: FingerprintAPI['register']['body'],
+  ): Promise<FingerprintAPI['register']['response']> {
     return this.fingerprintService.register(body);
   }
 
   @Get('find')
   async find(
-    @Query() querys: QueryType<FingerprintAPI['endpoints']['find']>,
-  ): Promise<FingerprintAPI['endpoints']['find']['response']> {
+    @Query() querys: QueryType<FingerprintAPI['find']>,
+  ): Promise<FingerprintAPI['find']['response']> {
     return this.fingerprintService.find(querys);
   }
 }

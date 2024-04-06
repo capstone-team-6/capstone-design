@@ -3,19 +3,18 @@ import { Fingerprint } from '../entities/fingerprint';
 import { DefineAPI } from './type';
 
 export type FingerprintAPI = DefineAPI<{
-  basePath: '/api/fingerprint';
-  endpoints: {
-    register: {
-      method: 'POST';
-      path: 'register';
-      body: FingerprintDTO.Register;
-      response: Fingerprint;
-    };
-    find: {
-      method: 'GET';
-      path: 'find';
-      query: ['buildingId', 'markerId'];
-      response: Fingerprint[];
-    };
+  register: {
+    method: 'POST';
+    basePath: '/api/fingerprint';
+    path: 'register';
+    body: FingerprintDTO.Register;
+    response: Fingerprint;
+  };
+  find: {
+    method: 'GET';
+    basePath: '/api/fingerprint';
+    path: 'find';
+    query: ['buildingId', 'markerId'];
+    response: Fingerprint[];
   };
 }>;
