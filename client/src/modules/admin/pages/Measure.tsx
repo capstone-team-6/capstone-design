@@ -1,8 +1,9 @@
 import { useFingerprintAPI } from "@/apis/fingerprint";
+import SignalInfo from "@/components/SignalInfo";
 import Spinner from "@/components/Spinner";
-import { PropType, defineComponent, reactive } from "vue";
+import { defineComponent, reactive } from "vue";
 import { APSignal } from "~/entities/fingerprint";
-import { useSignal } from "../lib/signal";
+import { useSignal } from "../../../composables/signal";
 
 export default defineComponent({
   name: "Measure",
@@ -27,8 +28,6 @@ export default defineComponent({
 
       input.signals = result;
     };
-
-    alert(import.meta.env.VITE_SERVER_URL);
 
     return () => {
       return [
@@ -74,37 +73,6 @@ export default defineComponent({
           </div>
         </div>,
       ];
-    };
-  },
-});
-
-const SignalInfo = defineComponent({
-  name: "Measure.SignalInfo",
-  props: {
-    signal: {
-      type: Object as PropType<APSignal>,
-      required: true,
-    },
-  },
-  setup(props) {
-    return () => {
-      const { BSSID, SSID, level } = props.signal;
-      return (
-        <table>
-          <tr>
-            <td>BSSID</td>
-            <td>{BSSID}</td>
-          </tr>
-          <tr>
-            <td>SSID</td>
-            <td>{SSID}</td>
-          </tr>
-          <tr>
-            <td>Level</td>
-            <td>{level}</td>
-          </tr>
-        </table>
-      );
     };
   },
 });

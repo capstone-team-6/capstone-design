@@ -20,6 +20,17 @@ export class FingerprintController {
   async find(
     @Query() querys: QueryType<FingerprintAPI['find']>,
   ): Promise<FingerprintAPI['find']['response']> {
-    return this.fingerprintService.find(querys);
+    const result = this.fingerprintService.find(querys);
+    return result;
+  }
+
+  @Post('find-position')
+  async findPosition(
+    @Body() body: FingerprintAPI['findPosition']['body'],
+  ): Promise<FingerprintAPI['findPosition']['response']> {
+    return this.fingerprintService.findNearestMarker(
+      body.buildingId,
+      body.signals,
+    );
   }
 }
