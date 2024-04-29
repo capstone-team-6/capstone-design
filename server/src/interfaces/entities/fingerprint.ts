@@ -1,7 +1,6 @@
 export type APSignal = {
   BSSID: string;
   SSID: string;
-  creator: string;
   level: number;
 };
 
