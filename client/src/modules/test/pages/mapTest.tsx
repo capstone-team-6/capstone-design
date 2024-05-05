@@ -1,4 +1,4 @@
-import mapView from '@/components/mapView';
+import mapView from '@/components/MapView';
 import { defineComponent } from 'vue';
 
 export default defineComponent({
