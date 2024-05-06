@@ -1,12 +1,12 @@
-import { defineComponent, onMounted, onUnmounted, ref } from 'vue';
+import { defineComponent, onMounted, onUnmounted, ref } from "vue";
 
 export default defineComponent({
-  name: 'InteractiveMap',
+  name: "InteractiveMap",
   props: {
     imageSrc: {
       type: String,
-      required: true
-    }
+      required: true,
+    },
   },
   setup(props) {
     const imageRef = ref<HTMLImageElement | null>(null);
@@ -33,8 +33,8 @@ export default defineComponent({
     const onMouseDown = (event: MouseEvent) => {
       event.preventDefault();
       startDrag(event.clientX, event.clientY);
-      window.addEventListener('mousemove', onMouseMove);
-      window.addEventListener('mouseup', onMouseUp);
+      window.addEventListener("mousemove", onMouseMove);
+      window.addEventListener("mouseup", onMouseUp);
     };
 
     const onMouseMove = (event: MouseEvent) => {
@@ -43,8 +43,8 @@ export default defineComponent({
 
     const onMouseUp = () => {
       endDrag();
-      window.removeEventListener('mousemove', onMouseMove);
-      window.removeEventListener('mouseup', onMouseUp);
+      window.removeEventListener("mousemove", onMouseMove);
+      window.removeEventListener("mouseup", onMouseUp);
     };
 
     const onTouchStart = (event: TouchEvent) => {
@@ -63,31 +63,34 @@ export default defineComponent({
 
     onMounted(() => {
       if (imageRef.value) {
-        imageRef.value.addEventListener('mousedown', onMouseDown);
-        imageRef.value.addEventListener('touchstart', onTouchStart);
-        imageRef.value.addEventListener('touchmove', onTouchMove);
-        imageRef.value.addEventListener('touchend', onTouchEnd);
+        imageRef.value.addEventListener("mousedown", onMouseDown);
+        imageRef.value.addEventListener("touchstart", onTouchStart);
+        imageRef.value.addEventListener("touchmove", onTouchMove);
+        imageRef.value.addEventListener("touchend", onTouchEnd);
       }
     });
 
     onUnmounted(() => {
       if (imageRef.value) {
-        imageRef.value.removeEventListener('mousedown', onMouseDown);
-        imageRef.value.removeEventListener('touchstart', onTouchStart);
-        imageRef.value.removeEventListener('touchmove', onTouchMove);
-        imageRef.value.removeEventListener('touchend', onTouchEnd);
+        imageRef.value.removeEventListener("mousedown", onMouseDown);
+        imageRef.value.removeEventListener("touchstart", onTouchStart);
+        imageRef.value.removeEventListener("touchmove", onTouchMove);
+        imageRef.value.removeEventListener("touchend", onTouchEnd);
       }
     });
 
     return () => (
-      <div>
-        <img ref={imageRef} src={props.imageSrc} style={{
-          position: 'absolute',
+      <img
+        ref={imageRef}
+        src={props.imageSrc}
+        style={{
+          position: "absolute",
           left: `${position.value.x}px`,
           top: `${position.value.y}px`,
-          cursor: 'grab'
-        }} alt="Draggable image" />
-      </div>
+          cursor: "grab",
+        }}
+        alt="Draggable image"
+      />
     );
-  }
+  },
 });
