@@ -37,7 +37,7 @@ export type MapAPI = DefineAPI<{
     basePath: '/api/map';
     path: 'qr-marker';
     body: MarkerDTO.Register;
-    response: Pick<Building['floor'][number], 'QRMarker'>;
+    response: boolean;
   };
 
   // 노드 마커 등록
@@ -46,6 +46,6 @@ export type MapAPI = DefineAPI<{
     basePath: '/api/map';
     path: 'node-marker';
     body: MarkerDTO.Register;
-    response: Pick<Building['floor'][number], 'nodeMarker'>;
+    response: boolean;
   };
 }>;

@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { ReturnDocument } from 'mongodb';
-import { Building, Marker } from 'src/interfaces/entities/map';
+import { Building, Floor, Marker } from 'src/interfaces/entities/map';
 import { DatabaseService } from '../util/database.service';
 
 @Injectable()
@@ -15,7 +15,7 @@ export class MapService {
   ): Promise<Building> {
     const document: Building = {
       ...buildingInfo,
-      floor: [],
+      floors: [],
     }; // 삽입할 데이터
 
     const result = await this.db.building.insertOne(document);
@@ -35,13 +35,10 @@ export class MapService {
   }
 
   async registerFloor(floorInfo: {
-    floor: Pick<
-      Building['floor'][number],
-      'floorId' | 'floorName' | 'mapImageURL'
-    >;
+    floor: Pick<Floor, 'floorId' | 'floorName' | 'mapImageURL'>;
     buildingId: Building['buildingId'];
   }): Promise<Building> {
-    const document: Building['floor'][number] = {
+    const document: Floor = {
       ...floorInfo.floor,
       QRMarker: [],
       nodeMarker: [],
@@ -51,7 +48,7 @@ export class MapService {
     const update = { $push: { floor: document } }; // 추가할 마커
     const options = { returnDocument: ReturnDocument.AFTER };
 
-    const updatedBuilding: Building = await this.db.building.findOneAndUpdate(
+    const updatedBuilding = await this.db.building.findOneAndUpdate(
       filter,
       update,
       options,
@@ -66,9 +63,9 @@ export class MapService {
 
   async registerQRMarker(QRInfo: {
     buildingId: Building['buildingId'];
-    floorId: Building['floor'][number]['floorId'];
+    floorId: Floor['floorId'];
     marker: Marker;
-  }): Promise<{ QRMarker: Marker[] }> {
+  }): Promise<boolean> {
     const filter = {
       buildingId: QRInfo.buildingId,
       'floor.floorId': QRInfo.floorId,
@@ -76,7 +73,7 @@ export class MapService {
     const update = { $push: { 'floor.$.QRMarker': QRInfo.marker } }; // 추가할 마커
     const options = { returnDocument: ReturnDocument.AFTER };
 
-    const updatedBuilding = await this.db.building.findOneAndUpdate(
+    const updatedBuilding: Building = await this.db.building.findOneAndUpdate(
       filter,
       update,
       options,
@@ -86,18 +83,14 @@ export class MapService {
       throw new Error('Failed to update QR marker');
     }
 
-    return {
-      QRMarker: updatedBuilding.floor.find(
-        (floor) => floor.floorId === QRInfo.floorId,
-      ).QRMarker,
-    };
+    return true;
   }
 
   async registerNodeMarker(NodeInfo: {
     buildingId: Building['buildingId'];
-    floorId: Building['floor'][number]['floorId'];
+    floorId: Floor['floorId'];
     marker: Marker;
-  }): Promise<{ nodeMarker: Marker[] }> {
+  }): Promise<boolean> {
     const filter = {
       buildingId: NodeInfo.buildingId,
       'floor.floorId': NodeInfo.floorId,
@@ -105,7 +98,7 @@ export class MapService {
     const update = { $push: { 'floor.$.nodeMarker': NodeInfo.marker } }; // 추가할 마커
     const options = { returnDocument: ReturnDocument.AFTER };
 
-    const updatedBuilding = await this.db.building.findOneAndUpdate(
+    const updatedBuilding: Building = await this.db.building.findOneAndUpdate(
       filter,
       update,
       options,
@@ -115,10 +108,6 @@ export class MapService {
       throw new Error('Failed to update node marker');
     }
 
-    return {
-      nodeMarker: updatedBuilding.floor.find(
-        (floor) => floor.floorId === NodeInfo.floorId,
-      ).nodeMarker,
-    };
+    return true;
   }
 }

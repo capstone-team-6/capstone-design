@@ -1,9 +1,9 @@
-import { Building, Marker } from '../entities/map';
+import { Building, Marker, Floor } from '../entities/map';
 
 export namespace MarkerDTO {
   export type Register = {
     buildingId: Building['buildingId'];
-    floorId: Building['floor'][number]['floorId'];
+    floorId: Floor['floorId'];
     marker: Marker;
   };
 }
@@ -13,7 +13,7 @@ export namespace BuildingDTO {
 
   export type RegisterFloor = {
     floor: Pick<
-      Building['floor'][number],
+      Floor,
       'floorId' | 'floorName' | 'mapImageURL'
     >;
     buildingId: Building['buildingId'];
