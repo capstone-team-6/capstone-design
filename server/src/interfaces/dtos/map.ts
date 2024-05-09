@@ -4,17 +4,17 @@ export namespace MarkerDTO {
   export type Register = {
     buildingId: Building['buildingId'];
     floorId: Floor['floorId'];
-    marker: Marker;
+    marker: Omit<Marker, 'markerId'>;
   };
 }
 
 export namespace BuildingDTO {
-  export type RegisterBuilding = Pick<Building, 'buildingId' | 'buildingName'>;
+  export type RegisterBuilding = Pick<Building, 'buildingName'>;
 
   export type RegisterFloor = {
     floor: Pick<
       Floor,
-      'floorId' | 'floorName' | 'mapImageURL'
+      'floorName' | 'mapImageURL'
     >;
     buildingId: Building['buildingId'];
   };

@@ -1,4 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
+import { randomUUID } from 'crypto';
 import { ReturnDocument } from 'mongodb';
 import { Building, Floor, Marker } from 'src/interfaces/entities/map';
 import { DatabaseService } from '../util/database.service';
@@ -11,14 +12,16 @@ export class MapService {
   ) {}
 
   async registerBuilding(
-    buildingInfo: Pick<Building, 'buildingId' | 'buildingName'>,
+    buildingInfo: Pick<Building, 'buildingName'>,
   ): Promise<Building> {
     const document: Building = {
+      buildingId: randomUUID(),
       ...buildingInfo,
       floors: [],
     }; // 삽입할 데이터
 
     const result = await this.db.building.insertOne(document);
+
     if (result.acknowledged === false) {
       throw new Error('Failed to insert new building');
     }
@@ -29,26 +32,27 @@ export class MapService {
   async FindBuilding(
     filter: Partial<Pick<Building, 'buildingId'>>,
   ): Promise<Building> {
-    const findMapImage: Building = await this.db.building.findOne(filter);
+    const updatedBuilding: Building = await this.db.building.findOne(filter);
 
-    return findMapImage;
+    return updatedBuilding;
   }
 
   async registerFloor(floorInfo: {
-    floor: Pick<Floor, 'floorId' | 'floorName' | 'mapImageURL'>;
+    floor: Pick<Floor, 'floorName' | 'mapImageURL'>;
     buildingId: Building['buildingId'];
   }): Promise<Building> {
     const document: Floor = {
+      floorId: randomUUID(),
       ...floorInfo.floor,
       QRMarker: [],
       nodeMarker: [],
     }; // 삽입할 데이터
 
     const filter = { buildingId: floorInfo.buildingId }; // 빌딩 아이디로 find
-    const update = { $push: { floor: document } }; // 추가할 마커
+    const update = { $push: { floors: document } }; // 추가할 마커
     const options = { returnDocument: ReturnDocument.AFTER };
 
-    const updatedBuilding = await this.db.building.findOneAndUpdate(
+    const updatedBuilding: Building = await this.db.building.findOneAndUpdate(
       filter,
       update,
       options,
@@ -64,13 +68,18 @@ export class MapService {
   async registerQRMarker(QRInfo: {
     buildingId: Building['buildingId'];
     floorId: Floor['floorId'];
-    marker: Marker;
-  }): Promise<boolean> {
+    marker: Omit<Marker, 'markerId'>;
+  }): Promise<Building> {
+    const document: Marker = {
+      markerId: randomUUID(),
+      ...QRInfo.marker,
+    };
+
     const filter = {
       buildingId: QRInfo.buildingId,
-      'floor.floorId': QRInfo.floorId,
+      'floors.floorId': QRInfo.floorId,
     }; // 빌딩 아이디와 층 아이디로 find
-    const update = { $push: { 'floor.$.QRMarker': QRInfo.marker } }; // 추가할 마커
+    const update = { $push: { 'floors.$.QRMarker': document } }; // 추가할 마커
     const options = { returnDocument: ReturnDocument.AFTER };
 
     const updatedBuilding: Building = await this.db.building.findOneAndUpdate(
@@ -83,19 +92,24 @@ export class MapService {
       throw new Error('Failed to update QR marker');
     }
 
-    return true;
+    return updatedBuilding;
   }
 
   async registerNodeMarker(NodeInfo: {
     buildingId: Building['buildingId'];
     floorId: Floor['floorId'];
-    marker: Marker;
-  }): Promise<boolean> {
+    marker: Omit<Marker, 'markerId'>;
+  }): Promise<Building> {
+    const document: Marker = {
+      markerId: randomUUID(),
+      ...NodeInfo.marker,
+    };
+
     const filter = {
       buildingId: NodeInfo.buildingId,
-      'floor.floorId': NodeInfo.floorId,
+      'floors.floorId': NodeInfo.floorId,
     }; // URL로 find
-    const update = { $push: { 'floor.$.nodeMarker': NodeInfo.marker } }; // 추가할 마커
+    const update = { $push: { 'floors.$.nodeMarker': document } }; // 추가할 마커
     const options = { returnDocument: ReturnDocument.AFTER };
 
     const updatedBuilding: Building = await this.db.building.findOneAndUpdate(
@@ -108,6 +122,6 @@ export class MapService {
       throw new Error('Failed to update node marker');
     }
 
-    return true;
+    return updatedBuilding;
   }
 }
