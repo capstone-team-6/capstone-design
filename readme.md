@@ -1,22 +1,14 @@
-## Commit Message Convention
-[Angular Convention][angular convention]을 간소화 하여 사용
-```
-<type>: <subject>
-```
-추후 프로젝트 규모에 따라 `<scope>` 등 추가
+# Lost Child Prevention Application
 
-[angular convention]: https://github.com/angular/angular/blob/22b96b9/CONTRIBUTING.md#-commit-message-guidelines
+To prevent indoor incidents of lost children, continuously track the child's position and provide guidance.
 
-## Branch Policy
-### Branch
-- `master`
-- `production`
-- `feature/<name>`
+## Feature
 
-### Flow
-1. 새로운 기능 `A`를 위해 `master`로부터 `feature/A` 브랜치 생성
-2. `feature/A`에서 기능 개발
-3. `origin/master`를 기준으로 rebase, coflict 발생 시 해결
-4. `feature/A`로부터 `master`로 pull request 생성 (필요 시 `draft` 지정)
-5. 코드 리뷰
-6. 모든 리뷰어가 승인 시, 다시 `origin/master`를 기준으로 rebase 후 merge
+### WPS(WiFi Positioning System)
+
+Determining position through the signal strength of access points requires a database of coordinate-signal strength pairs, known as a 'fingerprint.' We've streamlined the data collection process using QR codes.  
+Currently, position inference is achieved using KNN. Enhancing accuracy and performance may be possible through the adoption of more precise methods.
+
+### Indoor navigation
+
+We guide the shortest path to the child, even if they are on another floor. We designate certain points, such as doors and stairs, as nodes. By connecting these nodes, we can then apply traditional algorithms to find the shortest path within the graph.
