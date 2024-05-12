@@ -1,18 +1,44 @@
+import { useMapAPI } from "@/apis/map";
 import { defineComponent, onMounted, onUnmounted, ref } from "vue";
+import { Floor, Marker } from "~/entities/map";
+import MarkerComponet from "./MarkerView";
 
 export default defineComponent({
-  name: "InteractiveMap",
+  name: "MapComponent",
   props: {
-    imageSrc: {
+    buildingId: {
       type: String,
       required: true,
     },
+    floorId: {
+      type: String,
+      required: true,
+    },
+    markerImageSrc: {
+      type: String,
+      required: true,
+    },
+    // 어드민인 경우에만 마커 추가, 편집 가능
+    isAdmin: {
+      type: Boolean,
+      default: false,
+    },
+  },
+  components: {
+    MarkerComponet,
   },
   setup(props) {
-    const imageRef = ref<HTMLImageElement | null>(null);
+    const floorRef = ref<Floor | undefined>(undefined); // floor에 대한 정보를 담고 있는 객체
+
+    const mapRef = ref<HTMLImageElement | null>(null);
     const position = ref({ x: 0, y: 0 });
     let start = { x: 0, y: 0 };
     let dragging = false;
+
+    const markerImg = new Image();
+    markerImg.src = props.markerImageSrc;
+
+    const { findBuilding, registerQRMarker } = useMapAPI();
 
     const startDrag = (x: number, y: number) => {
       dragging = true;
@@ -32,9 +58,11 @@ export default defineComponent({
 
     const onMouseDown = (event: MouseEvent) => {
       event.preventDefault();
-      startDrag(event.clientX, event.clientY);
-      window.addEventListener("mousemove", onMouseMove);
-      window.addEventListener("mouseup", onMouseUp);
+      if (event.button === 0) {
+        startDrag(event.clientX, event.clientY);
+        window.addEventListener("mousemove", onMouseMove);
+        window.addEventListener("mouseup", onMouseUp);
+      }
     };
 
     const onMouseMove = (event: MouseEvent) => {
@@ -61,36 +89,95 @@ export default defineComponent({
       endDrag();
     };
 
-    onMounted(() => {
-      if (imageRef.value) {
-        imageRef.value.addEventListener("mousedown", onMouseDown);
-        imageRef.value.addEventListener("touchstart", onTouchStart);
-        imageRef.value.addEventListener("touchmove", onTouchMove);
-        imageRef.value.addEventListener("touchend", onTouchEnd);
+    // 우클릭인 경우 마커 추가
+    const onRightClick = (event: MouseEvent) => {
+      event.preventDefault();
+
+      if (mapRef.value) {
+        const rect = mapRef.value.getBoundingClientRect();
+
+        const x = event.clientX - rect.left - markerImg.width / 2; // 클릭 위치와 마커 위치 맞춤
+        const y = event.clientY - rect.top - markerImg.height;
+
+        // 마커 객체 생성
+        const newQRMarker: Omit<Marker, "markerId"> = {
+          markerName: "",
+          xLocation: x,
+          yLocation: y,
+          nearNodeId: [],
+        };
+
+        // 마커 등록
+        registerQRMarker(
+          {},
+          {},
+          {
+            buildingId: props.buildingId,
+            floorId: props.floorId,
+            marker: newQRMarker,
+          }
+        ).then(
+          // Floor 객체 업데이트
+          (result) =>
+            (floorRef.value = result.floors.find(
+              (floor) => floor.floorId === props.floorId
+            ))
+        );
       }
+    };
+
+    // Floor 객체 찾기
+    const findFloor = () => {
+      console.log(props.buildingId);
+      findBuilding({ buildingId: props.buildingId }, {}).then(
+        (result) =>
+          (floorRef.value = result.floors.find(
+            (floor) => floor.floorId === props.floorId
+          ))
+      );
+    };
+
+    onMounted(() => {
+      if (mapRef.value) {
+        mapRef.value.addEventListener("mousedown", onMouseDown);
+        mapRef.value.addEventListener("touchstart", onTouchStart);
+        mapRef.value.addEventListener("touchmove", onTouchMove);
+        mapRef.value.addEventListener("touchend", onTouchEnd);
+        mapRef.value.addEventListener("contextmenu", onRightClick);
+      }
+
+      findFloor(); // 컴포넌트 마운트 후 플로어 객체 찾기
     });
 
     onUnmounted(() => {
-      if (imageRef.value) {
-        imageRef.value.removeEventListener("mousedown", onMouseDown);
-        imageRef.value.removeEventListener("touchstart", onTouchStart);
-        imageRef.value.removeEventListener("touchmove", onTouchMove);
-        imageRef.value.removeEventListener("touchend", onTouchEnd);
+      if (mapRef.value) {
+        mapRef.value.removeEventListener("mousedown", onMouseDown);
+        mapRef.value.removeEventListener("touchstart", onTouchStart);
+        mapRef.value.removeEventListener("touchmove", onTouchMove);
+        mapRef.value.removeEventListener("touchend", onTouchEnd);
       }
     });
 
     return () => (
-      <img
-        ref={imageRef}
-        src={props.imageSrc}
+      <div
+        ref={mapRef}
+        class="w-[1600px] h-[960px] bg-cover bg-center cursor-grab active:cursor-grabbing"
         style={{
-          position: "absolute",
-          left: `${position.value.x}px`,
-          top: `${position.value.y}px`,
-          cursor: "grab",
+          backgroundImage: `url("${floorRef.value?.mapImageURL}")`,
+          transform: `translate(${position.value.x}px, ${position.value.y}px)`,
         }}
-        alt="Draggable image"
-      />
+      >
+        {floorRef.value &&
+          floorRef.value.QRMarker.map((marker, index) => (
+            <MarkerComponet
+              key={index}
+              imageSrc={markerImg.src}
+              position={{ x: marker.xLocation, y: marker.yLocation }}
+              markerId={marker.markerId}
+              isAdmin={props.isAdmin}
+            />
+          ))}
+      </div>
     );
   },
 });
