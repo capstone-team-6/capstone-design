@@ -5,6 +5,7 @@ import { Config } from 'src/configuration';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { FingerprintModule } from './fingerprint/fingerprint.module';
+import { MapModule } from './map/map.module';
 import { UtilModule } from './util/util.module';
 
 @Module({
@@ -17,6 +18,7 @@ import { UtilModule } from './util/util.module';
     }),
     UtilModule,
     FingerprintModule,
+    MapModule,
   ],
   controllers: [AppController],
   providers: [AppService],
