@@ -14,9 +14,15 @@ export default defineComponent({
     auth.authStateReady().then(() => (state.isAuthStateReady = true));
 
     return () => {
-      if (!state.isAuthStateReady) return <div>로그인 정보 확인 중</div>;
-
-      return <RouterView />;
+      return (
+        <div class="w-full max-w-sm mx-auto">
+          {state.isAuthStateReady ? (
+            <RouterView />
+          ) : (
+            <div>로그인 정보 확인 중</div>
+          )}
+        </div>
+      );
     };
   },
 });

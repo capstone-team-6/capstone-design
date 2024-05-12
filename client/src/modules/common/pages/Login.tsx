@@ -1,7 +1,9 @@
+import { AppButton } from "@/components/AppButton";
+import { Icon } from "@/components/Icon";
 import { firebaseApp } from "@/utils/firebase";
 import { GoogleAuthProvider, getAuth, signInWithRedirect } from "firebase/auth";
 
-import { defineComponent } from "vue";
+import { defineComponent, reactive } from "vue";
 import { LocationQueryValue, useRoute, useRouter } from "vue-router";
 
 export default defineComponent({
@@ -20,13 +22,30 @@ export default defineComponent({
       router.replace(next ?? "/");
     });
 
+    const state = reactive({
+      mode: null,
+    });
+
     return () => {
       return (
-        <div>
-          <button onClick={() => auth.signOut()}>로그아웃</button>
-          <button onClick={() => signInWithRedirect(auth, googleProvider)}>
-            구글 로그인
-          </button>
+        <div class="pt-48">
+          <div class="flex items-center">
+            <Icon type="chevron-down" class="" />
+            <div class="text-2xl ml-2 font-semibold">
+              <span class="text-[#F35A0C]">
+                {state.mode === null ? "어떤 모드" : state.mode}
+              </span>
+              로 로그인하시겠습니까?
+            </div>
+          </div>
+          <div class="mt-6">
+            <AppButton onClick={() => signInWithRedirect(auth, googleProvider)}>
+              구글 로그인
+            </AppButton>
+            <AppButton class="bg-black mt-2" onClick={() => auth.signOut()}>
+              로그아웃
+            </AppButton>
+          </div>
         </div>
       );
     };
