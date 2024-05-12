@@ -7,10 +7,20 @@ import { useSignal } from "../../../composables/signal";
 
 export default defineComponent({
   name: "Measure",
-  setup() {
+  props: {
+    buildingId: {
+      type: String,
+      default: "home",
+    },
+    markerId: {
+      type: String,
+      default: "test_marker1",
+    },
+  },
+  setup(props) {
     const input = reactive({
-      buildingId: "home",
-      markerId: "",
+      buildingId: props.buildingId,
+      markerId: props.markerId,
       signals: [] as APSignal[],
     });
 
