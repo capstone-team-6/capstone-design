@@ -161,7 +161,7 @@ export default defineComponent({
     return () => (
       <div
         ref={mapRef}
-        class="w-[1600px] h-[960px] bg-cover bg-center cursor-grab active:cursor-grabbing"
+        class="w-[2600px] h-[860px] bg-cover bg-center cursor-grab active:cursor-grabbing"
         style={{
           backgroundImage: `url("${floorRef.value?.mapImageURL}")`,
           transform: `translate(${position.value.x}px, ${position.value.y}px)`,
