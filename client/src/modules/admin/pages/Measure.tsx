@@ -42,15 +42,22 @@ export default defineComponent({
       successedMarkerId.value = content[0].rawValue;
     };
 
+    const cameraSwitch = ref(true);
+
     return () => {
       return [
         state.isLoading && <Spinner />,
         <div>
           <QrcodeStream
             onDetect={onDecode}
-            constraints={{ facingMode: "environment" }}
+            constraints={cameraSwitch.value ? { facingMode: "environment" } : { facingMode: "user" } }
           />
           <p>등록 완료-{successedMarkerId.value}</p>
+          <button
+            onClick={() => {
+              cameraSwitch.value = !cameraSwitch.value;
+            }}
+          >카메라 변경</button>
         </div>,
       ];
     };
