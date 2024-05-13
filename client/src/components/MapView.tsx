@@ -23,6 +23,12 @@ export default defineComponent({
       type: Boolean,
       default: false,
     },
+
+    //temp
+    user: {
+      type: String,
+      required: false,
+    },
   },
   components: {
     MarkerComponet,
@@ -168,15 +174,22 @@ export default defineComponent({
         }}
       >
         {floorRef.value &&
-          floorRef.value.QRMarker.map((marker, index) => (
-            <MarkerComponet
-              key={index}
-              imageSrc={markerImg.src}
-              position={{ x: marker.xLocation, y: marker.yLocation }}
-              markerId={marker.markerId}
-              isAdmin={props.isAdmin}
-            />
-          ))}
+          floorRef.value.QRMarker.map((marker, index) =>
+            marker.markerId === props.user ? (
+              <div
+                class="w-2 h-2 absolute"
+                style={{ left: marker.xLocation, top: marker.yLocation }}
+              ></div>
+            ) : (
+              <MarkerComponet
+                key={index}
+                imageSrc={markerImg.src}
+                position={{ x: marker.xLocation, y: marker.yLocation }}
+                markerId={marker.markerId}
+                isAdmin={props.isAdmin}
+              />
+            )
+          )}
       </div>
     );
   },

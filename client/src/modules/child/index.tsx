@@ -1,10 +1,13 @@
 import { useFingerprintAPI } from "@/apis/fingerprint";
-import SignalInfo from "@/components/SignalInfo";
+import MapView from "@/components/MapView";
 import { useSignal } from "@/composables/signal";
+import { create } from "@tensorflow-models/knn-classifier";
+import * as tf from "@tensorflow/tfjs";
 import { defineComponent, onUnmounted, reactive } from "vue";
 import { useRouter } from "vue-router";
 import { APSignal, Fingerprint } from "~/entities/fingerprint";
-import { AdminRoute } from "../admin/routes";
+
+const buildingId = "e8296b0c-9f2f-4191-9a53-d683b8cecc05";
 
 export default defineComponent({
   name: "Child",
@@ -18,20 +21,58 @@ export default defineComponent({
     const { subscribe } = useSignal();
     const { find } = useFingerprintAPI();
 
-    find({ buildingId: "home" }, {}).then(
-      (result) => (state.fingerprints = result)
-    );
+    const classifier = create();
+    const sortedIds = [] as string[];
+
+    const MIN_RSSI = -100 as const;
+
+    find({ buildingId }, {}).then((fingerprints) => {
+      const idSet = new Set<string>([
+        ...fingerprints
+          .map((fingerprint) =>
+            fingerprint.signals.map((signal) => signal.BSSID)
+          )
+          .flat(),
+      ]);
+
+      sortedIds.push(...Array.from(idSet).sort());
+
+      fingerprints.forEach((fingerprint) => {
+        const tensor = tf.tensor(
+          sortedIds.map(
+            (id) =>
+              fingerprint.signals.find((signal) => signal.BSSID === id) ??
+              MIN_RSSI
+          )
+        );
+
+        classifier.addExample(tensor, fingerprint.markerId);
+      });
+
+      return;
+    });
 
     const { isLoading, unsubscribe } = subscribe(async (signals) => {
-      state.signals = signals;
+      if (sortedIds.length === 0) return;
 
-      const { distance, position } = findPosition(
-        state.signals,
-        state.fingerprints
+      const tensor = tf.tensor(
+        sortedIds.map(
+          (id) => signals.find((signal) => signal.BSSID === id) ?? MIN_RSSI
+        )
       );
 
-      state.distance = distance;
-      state.position = position;
+      const result = await classifier.predictClass(tensor);
+      state.position = result.label;
+
+      // state.signals = signals;
+
+      // const { distance, position } = findPosition(
+      //   state.signals,
+      //   state.fingerprints
+      // );
+
+      // state.distance = distance;
+      // state.position = position;
     }, 3000);
 
     onUnmounted(() => {
@@ -42,25 +83,31 @@ export default defineComponent({
 
     return () => {
       return (
-        <div>
-          <button onClick={() => router.push({ name: AdminRoute.MEASURE })}>
-            수집
-          </button>
-          <div>{isLoading.value && <div>로딩 중</div>}</div>
-          <div class="flex">
-            <div>위치</div>
-            <div>{state.position}</div>
-          </div>
-          <div class="flex">
-            <div>거리</div>
-            <div>{state.distance}</div>
-          </div>
-          <div>
-            {state.signals.map((signal) => (
-              <SignalInfo signal={signal} />
-            ))}
-          </div>
-        </div>
+        <MapView
+          buildingId={buildingId}
+          floorId="1a7cf235-ab2e-4c79-a6dc-fa3fbc221fbf"
+          markerImageSrc="https://storage.googleapis.com/cau-team6-data/marker-red.svg"
+          user={state.position}
+        />
+        // <div>
+        //   <button onClick={() => router.push({ name: AdminRoute.MEASURE })}>
+        //     수집
+        //   </button>
+        //   <div>{isLoading.value && <div>로딩 중</div>}</div>
+        //   <div class="flex">
+        //     <div>위치</div>
+        //     <div>{state.position}</div>
+        //   </div>
+        //   <div class="flex">
+        //     <div>거리</div>
+        //     <div>{state.distance}</div>
+        //   </div>
+        //   <div>
+        //     {state.signals.map((signal) => (
+        //       <SignalInfo signal={signal} />
+        //     ))}
+        //   </div>
+        // </div>
       );
     };
   },

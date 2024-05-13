@@ -9,11 +9,13 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@tensorflow-models/knn-classifier": "^1.2.6",
+    "@tensorflow/tfjs": "^4.19.0",
     "firebase": "^10.11.1",
     "vue": "^3.3.11",
-    "vue-router": "^4.3.0",
+    "vue-qrcode": "2.2.2",
     "vue-qrcode-reader": "5.5.4",
-    "vue-qrcode": "2.2.2"
+    "vue-router": "^4.3.0"
   },
   "devDependencies": {
     "@types/node": "^20.12.5",
