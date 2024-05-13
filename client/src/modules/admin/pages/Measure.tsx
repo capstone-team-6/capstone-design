@@ -1,28 +1,22 @@
 import { useFingerprintAPI } from "@/apis/fingerprint";
-import SignalInfo from "@/components/SignalInfo";
 import Spinner from "@/components/Spinner";
-import { defineComponent, reactive } from "vue";
+import { defineComponent, reactive, ref } from "vue";
+import { QrcodeStream } from "vue-qrcode-reader";
 import { APSignal } from "~/entities/fingerprint";
 import { useSignal } from "../../../composables/signal";
 
 export default defineComponent({
   name: "Measure",
-  props: {
-    buildingId: {
-      type: String,
-      default: "home",
-    },
-    markerId: {
-      type: String,
-      default: "test_marker1",
-    },
+  components: {
+    QrcodeStream,
   },
-  setup(props) {
+  setup() {
     const input = reactive({
-      buildingId: props.buildingId,
-      markerId: props.markerId,
+      buildingId: "e8296b0c-9f2f-4191-9a53-d683b8cecc05", // 208관
+      markerId: "",
       signals: [] as APSignal[],
     });
+    const successedMarkerId = ref("");
 
     const state = reactive({
       isLoading: false,
@@ -39,48 +33,21 @@ export default defineComponent({
       input.signals = result;
     };
 
+    const onDecode = async (content: { rawValue: string }[]) => {
+      input.markerId = content[0].rawValue;
+      state.isLoading = true;
+      await scan();
+      await register({}, {}, input);
+      state.isLoading = false;
+      successedMarkerId.value = content[0].rawValue;
+    };
+
     return () => {
       return [
         state.isLoading && <Spinner />,
         <div>
-          <div>
-            <div>빌딩 id</div>
-            <input
-              type="text"
-              value={input.buildingId}
-              onInput={(e) =>
-                (input.buildingId = (e.target as HTMLInputElement).value)
-              }
-            />
-          </div>
-          <div>
-            <div>마커 id</div>
-            <input
-              type="text"
-              value={input.markerId}
-              onInput={(e) =>
-                (input.markerId = (e.target as HTMLInputElement).value)
-              }
-            />
-          </div>
-          <button
-            onClick={async () => {
-              state.isLoading = true;
-              await register({}, {}, input);
-              state.isLoading = false;
-            }}
-            class="block text-xl"
-          >
-            등록
-          </button>
-          <button onClick={scan} class="block text-xl mt-4">
-            측정
-          </button>
-          <div>
-            {input.signals.map((signal) => (
-              <SignalInfo signal={signal} />
-            ))}
-          </div>
+          <QrcodeStream onDetect={onDecode} />
+          <p>등록 완료-{successedMarkerId.value}</p>
         </div>,
       ];
     };
