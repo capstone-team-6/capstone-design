@@ -46,7 +46,10 @@ export default defineComponent({
       return [
         state.isLoading && <Spinner />,
         <div>
-          <QrcodeStream onDetect={onDecode} />
+          <QrcodeStream
+            onDetect={onDecode}
+            constraints={{ facingMode: "environment" }}
+          />
           <p>등록 완료-{successedMarkerId.value}</p>
         </div>,
       ];
