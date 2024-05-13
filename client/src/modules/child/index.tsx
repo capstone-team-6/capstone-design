@@ -41,8 +41,8 @@ export default defineComponent({
         const tensor = tf.tensor(
           sortedIds.map(
             (id) =>
-              fingerprint.signals.find((signal) => signal.BSSID === id) ??
-              MIN_RSSI
+              fingerprint.signals.find((signal) => signal.BSSID === id)
+                ?.level ?? MIN_RSSI
           )
         );
 
@@ -57,7 +57,8 @@ export default defineComponent({
 
       const tensor = tf.tensor(
         sortedIds.map(
-          (id) => signals.find((signal) => signal.BSSID === id) ?? MIN_RSSI
+          (id) =>
+            signals.find((signal) => signal.BSSID === id)?.level ?? MIN_RSSI
         )
       );
 
