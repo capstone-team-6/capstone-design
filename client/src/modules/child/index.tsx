@@ -1,5 +1,6 @@
 import { useFingerprintAPI } from "@/apis/fingerprint";
 import MapView from "@/components/MapView";
+import Spinner from "@/components/Spinner";
 import { useSignal } from "@/composables/signal";
 import { create } from "@tensorflow-models/knn-classifier";
 import * as tf from "@tensorflow/tfjs";
@@ -49,6 +50,19 @@ export default defineComponent({
         classifier.addExample(tensor, fingerprint.markerId);
       });
 
+      fingerprints.forEach(async (fingerprint) => {
+        const tensor = tf.tensor(
+          sortedIds.map(
+            (id) =>
+              fingerprint.signals.find((signal) => signal.BSSID === id)
+                ?.level ?? MIN_RSSI
+          )
+        );
+
+        const result = await classifier.predictClass(tensor);
+        console.log(result.label, fingerprint.markerId);
+      });
+
       return;
     });
 
@@ -63,6 +77,7 @@ export default defineComponent({
       );
 
       const result = await classifier.predictClass(tensor);
+
       state.position = result.label;
 
       // state.signals = signals;
@@ -83,6 +98,8 @@ export default defineComponent({
     const router = useRouter();
 
     return () => {
+      if (isLoading.value) return <Spinner />;
+
       return (
         <MapView
           buildingId={buildingId}

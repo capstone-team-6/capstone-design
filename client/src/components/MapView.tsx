@@ -177,7 +177,7 @@ export default defineComponent({
           floorRef.value.QRMarker.map((marker, index) =>
             marker.markerId === props.user ? (
               <div
-                class="w-2 h-2 absolute"
+                class="w-2 h-2 absolute bg-black"
                 style={{ left: marker.xLocation, top: marker.yLocation }}
               ></div>
             ) : (
