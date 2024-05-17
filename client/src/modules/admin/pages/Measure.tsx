@@ -1,34 +1,33 @@
 import { useFingerprintAPI } from "@/apis/fingerprint";
-import SignalInfo from "@/components/SignalInfo";
 import Spinner from "@/components/Spinner";
-import { defineComponent, reactive } from "vue";
+import { defineComponent, reactive, ref, nextTick } from "vue";
+import { QrcodeStream } from "vue-qrcode-reader";
 import { APSignal } from "~/entities/fingerprint";
 import { useSignal } from "../../../composables/signal";
 
 export default defineComponent({
   name: "Measure",
-  props: {
-    buildingId: {
-      type: String,
-      default: "home",
-    },
-    markerId: {
-      type: String,
-      default: "test_marker1",
-    },
+  components: {
+    QrcodeStream,
   },
-  setup(props) {
+  setup() {
     const input = reactive({
-      buildingId: props.buildingId,
-      markerId: props.markerId,
+      buildingId: "e8296b0c-9f2f-4191-9a53-d683b8cecc05", // 208관
+      markerId: "",
       signals: [] as APSignal[],
     });
+    const successedMarkerId = ref("");
+    const markerCnt = ref(0);
 
     const state = reactive({
       isLoading: false,
     });
 
-    const { register } = useFingerprintAPI();
+    const cameraSwitch = ref(true);
+    const cameraPaused = ref(false);
+    const isRegister = ref(false);
+
+    const { register, find } = useFingerprintAPI();
     const { get } = useSignal();
 
     const scan = async () => {
@@ -39,48 +38,58 @@ export default defineComponent({
       input.signals = result;
     };
 
+    const onDecode = async (content: { rawValue: string }[]) => {
+      input.markerId = content[0].rawValue;
+      state.isLoading = true;
+      await scan();
+      await register({}, {}, input);
+      await find({ markerId: input.markerId }, {}).then(
+        (result) => (markerCnt.value = result.length)
+      );
+      state.isLoading = false;
+      successedMarkerId.value = content[0].rawValue;
+      isRegister.value = true;
+    };
+
     return () => {
       return [
         state.isLoading && <Spinner />,
         <div>
-          <div>
-            <div>빌딩 id</div>
-            <input
-              type="text"
-              value={input.buildingId}
-              onInput={(e) =>
-                (input.buildingId = (e.target as HTMLInputElement).value)
-              }
-            />
-          </div>
-          <div>
-            <div>마커 id</div>
-            <input
-              type="text"
-              value={input.markerId}
-              onInput={(e) =>
-                (input.markerId = (e.target as HTMLInputElement).value)
-              }
-            />
-          </div>
+          <QrcodeStream
+            onDetect={onDecode}
+            constraints={
+              cameraSwitch.value
+                ? { facingMode: "environment" }
+                : { facingMode: "user" }
+            }
+            paused={cameraPaused.value}
+          />
+          {isRegister.value && (
+            <p>
+              등록 완료 <br />
+              Marker ID-{successedMarkerId.value}
+              <br />
+              Fingerprint 개수-{markerCnt.value}
+            </p>
+          )}
           <button
-            onClick={async () => {
-              state.isLoading = true;
-              await register({}, {}, input);
-              state.isLoading = false;
+            onClick={() => {
+              cameraSwitch.value = !cameraSwitch.value;
             }}
-            class="block text-xl"
           >
-            등록
+            카메라 변경
           </button>
-          <button onClick={scan} class="block text-xl mt-4">
-            측정
+          <button
+            onClick={() => {
+              isRegister.value = false;
+              cameraPaused.value = true;
+              nextTick(() => {
+                cameraPaused.value = false;
+              });
+            }}
+          >
+            QR 캐시 Clear
           </button>
-          <div>
-            {input.signals.map((signal) => (
-              <SignalInfo signal={signal} />
-            ))}
-          </div>
         </div>,
       ];
     };
