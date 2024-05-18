@@ -23,7 +23,7 @@ export default defineComponent({
   },
   components: {
     QRGenerate,
-  },
+  }, //FIXME: 삭제
   setup(props) {
     const markerRef = ref<HTMLImageElement | null>(null);
     const position = ref(props.position);
@@ -64,12 +64,17 @@ export default defineComponent({
           }}
         />
         {isClick.value && (
-          <div>
+          <div class="fixed top-0 right-0 h-full w-64 bg-gray-800 text-white">
             <QRGenerate data={props.markerId} />
-            <p class="bg-white">{props.markerId}</p>
+            <p>{props.markerId}</p>
           </div>
         )}
       </div>
     );
+    // TODO:
+    // 마커 삭제
+    // 마커 이름 변경
+    // 인접 노드 설정
+    // 마커 이름 띄우기
   },
 });
