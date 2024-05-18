@@ -21,9 +21,6 @@ export default defineComponent({
       default: false,
     },
   },
-  components: {
-    QRGenerate,
-  }, //FIXME: 삭제
   setup(props) {
     const markerRef = ref<HTMLImageElement | null>(null);
     const position = ref(props.position);

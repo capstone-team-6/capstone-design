@@ -22,10 +22,6 @@ export default defineComponent({
       default: false,
     },
   },
-  components: {
-    MapComponet,
-    MarkerComponet,
-  }, //FIXME: 삭제
   setup(props) {
     const floorRef = ref<Floor | undefined>(undefined); // floor에 대한 정보를 담고 있는 객체
 

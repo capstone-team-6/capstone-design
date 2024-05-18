@@ -7,9 +7,6 @@ import { useSignal } from "../../../composables/signal";
 
 export default defineComponent({
   name: "Measure",
-  components: {
-    QrcodeStream,
-  },
   setup() {
     const input = reactive({
       buildingId: "e8296b0c-9f2f-4191-9a53-d683b8cecc05", // 208관
