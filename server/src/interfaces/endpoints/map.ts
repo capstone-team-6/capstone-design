@@ -48,4 +48,22 @@ export type MapAPI = DefineAPI<{
     body: MarkerDTO.Register;
     response: Building;
   };
+
+  // 인접 노드 등록
+  combineNearNode: {
+    method: 'POST';
+    basePath: '/api/map';
+    path: 'combine-node';
+    body: MarkerDTO.CombineNode;
+    response: Building;
+  };
+
+  // 마커 이름 업데이트
+  updateMarkerName: {
+    method: 'POST';
+    basePath: '/api/map';
+    path: 'marker-name';
+    body: MarkerDTO.UpdateName;
+    response: Building;
+  };
 }>;

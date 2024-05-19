@@ -44,4 +44,18 @@ export class MapController {
   ): Promise<MapAPI['registerNodeMarker']['response']> {
     return this.mapService.registerNodeMarker(body);
   }
+
+  @Post('combine-node') // 길찾기 위한 인접 노드 등록
+  async combineNearNode(
+    @Body() body: MapAPI['combineNearNode']['body'],
+  ): Promise<MapAPI['combineNearNode']['response']> {
+    return this.mapService.combineNearNode(body);
+  }
+
+  @Post('marker-name') // 마커 이름 업데이트
+  async updateMarkerName(
+    @Body() body: MapAPI['updateMarkerName']['body'],
+  ): Promise<MapAPI['updateMarkerName']['response']> {
+    return this.mapService.updateMarkerName(body);
+  }
 }
