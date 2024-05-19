@@ -24,3 +24,7 @@ export type ParamType<T extends Endpoint> = Record<T['param'][number], string>;
 export type QueryType<T extends Endpoint> = Partial<
   Record<T['query'][number], string>
 >;
+
+export type Result<T> =
+  | { success: true; data: T }
+  | { success: false; message: string };
