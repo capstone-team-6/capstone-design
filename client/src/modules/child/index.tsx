@@ -18,9 +18,9 @@ export default defineComponent({
     const { subscribe } = useSignal();
     const { find } = useFingerprintAPI();
 
-    find({ buildingId: "home" }, {}).then(
-      (result) => (state.fingerprints = result)
-    );
+    find({ buildingId: "home" }, {}).then((result) => {
+      if (result.success) state.fingerprints = result.data;
+    });
 
     const { isLoading, unsubscribe } = subscribe(async (signals) => {
       state.signals = signals;

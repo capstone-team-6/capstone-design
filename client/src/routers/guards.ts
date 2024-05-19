@@ -9,5 +9,9 @@ export const authGuard: NavigationGuard = async (to, _, next) => {
 
   if (auth.currentUser) return next();
 
-  next({ name: CommonRoute.LOGIN, query: { next: to.path } });
+  next({
+    name: CommonRoute.SIGN_IN,
+    query: { next: to.path },
+    params: { type: "child" },
+  });
 };
