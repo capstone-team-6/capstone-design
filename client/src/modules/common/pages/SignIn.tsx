@@ -1,6 +1,5 @@
 import { AppButton } from "@/components/AppButton";
 import { useAuthStore } from "@/stores/auth";
-
 import { computed, defineComponent } from "vue";
 import {
   LocationQueryValue,
@@ -9,7 +8,8 @@ import {
   useRouter,
 } from "vue-router";
 import { User } from "~/entities/user";
-import { CommonRoute } from "../routes";
+
+import { CommonRoute } from "@/routers/route";
 import { typeLabel } from "../utils/type";
 
 export default defineComponent({

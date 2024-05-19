@@ -1,10 +1,10 @@
 import { useFingerprintAPI } from "@/apis/fingerprint";
 import SignalInfo from "@/components/SignalInfo";
 import { useSignal } from "@/composables/signal";
+import { AdminRoute } from "@/routers/route";
 import { defineComponent, onUnmounted, reactive } from "vue";
 import { useRouter } from "vue-router";
 import { APSignal, Fingerprint } from "~/entities/fingerprint";
-import { AdminRoute } from "../admin/routes";
 
 export default defineComponent({
   name: "Child",

@@ -1,12 +1,8 @@
 import { authGuard } from "@/routers/guards";
+import { CommonRoute } from "@/routers/route";
 import { RouteRecordRaw } from "vue-router";
 import SignIn from "./pages/SignIn";
 import SignUp from "./pages/SignUp";
-
-export enum CommonRoute {
-  SIGN_IN = "sign in",
-  SIGN_UP = "sign up",
-}
 
 export const commonRoutes: RouteRecordRaw[] = [
   {
