@@ -25,11 +25,23 @@ export const useMapAPI = () => {
     "POST"
   );
 
+  const combineNearNode = makeAPI<MapAPI["combineNearNode"]>(
+    "/api/map/combine-node",
+    "POST"
+  );
+
+  const updateMarkerName = makeAPI<MapAPI["updateMarkerName"]>(
+    "/api/map/marker-name",
+    "POST"
+  );
+
   return {
     registerBuilding,
     findBuilding,
     registerFloor,
     registerQRMarker,
     registerNodeMarker,
+    combineNearNode,
+    updateMarkerName,
   };
 };

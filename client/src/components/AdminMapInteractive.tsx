@@ -1,7 +1,7 @@
 import { useMapAPI } from "@/apis/map";
 import markerImgSrc from "@/assets/red_marker.svg";
 import { defineComponent, onMounted, ref } from "vue";
-import { Floor, Marker } from "~/entities/map";
+import { Building, Floor, Marker } from "~/entities/map";
 import MapComponet from "./MapView";
 import MarkerComponet from "./MarkerView";
 
@@ -79,6 +79,13 @@ export default defineComponent({
       );
     };
 
+    // Floor 업데이트
+    const updateFloor = (building: Building) => {
+      floorRef.value = building.floors.find(
+        (floor) => floor.floorId === props.floorId
+      );
+    };
+
     onMounted(() => {
       findFloor(); // 컴포넌트 마운트 후 플로어 객체 찾기
     });
@@ -97,8 +104,9 @@ export default defineComponent({
               key={index}
               imageSrc={markerImg.src}
               position={{ x: marker.xLocation, y: marker.yLocation }}
-              markerId={marker.markerId}
+              marker={marker}
               isAdmin={props.isAdmin}
+              onEvent:buttonClick={updateFloor}
             />
           ))}
       </MapComponet>
