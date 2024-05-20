@@ -2,8 +2,6 @@ import { ref } from "vue";
 import { APSignal } from "~/entities/fingerprint";
 
 export const useMockSignal = (isSecond: boolean = false) => {
-  const scan = () => (window as any).Bridge.startScan();
-
   const subscribe = (callback: (signal: APSignal[]) => any) => {
     const isLoading = ref(false);
     let isContinue = true;
@@ -12,14 +10,13 @@ export const useMockSignal = (isSecond: boolean = false) => {
     const handler = () => {
       isLoading.value = false;
 
+      callback(isSecond ? mockData2 : mockData);
       isLoading.value = true;
-      timeoutHandle = setTimeout(
-        () => callback(isSecond ? mockData2 : mockData),
-        3000
-      );
+
+      timeoutHandle = setTimeout(() => handler(), 1000);
     };
 
-    timeoutHandle = setTimeout(() => handler(), 3000);
+    timeoutHandle = setTimeout(() => handler(), 0);
     isLoading.value = true;
 
     const unsubscribe = () => {

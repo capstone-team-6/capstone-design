@@ -23,7 +23,6 @@ export const useSocket = () => {
   };
 
   const send = <T extends Message>(message: T) => {
-    alert(authStore.context.user!.id);
     socket.send(
       JSON.stringify({
         event: message.event,

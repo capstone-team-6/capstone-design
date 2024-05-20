@@ -8,7 +8,7 @@ import MapView from "@/components/MapView";
 import { Sidebar } from "@/components/Sidebar";
 import UserMarker from "@/components/UserMarker";
 import { usePosition } from "@/composables/position";
-import { useSignal } from "@/composables/signal";
+import { useMockSignal } from "@/composables/signal.mock";
 import { useSocket } from "@/composables/socket";
 import { useAuthStore } from "@/stores/auth";
 import { defineComponent, onUnmounted, reactive } from "vue";
@@ -22,7 +22,7 @@ export default defineComponent({
     const { listUsers } = useUserAPI();
     const { findBuilding } = useMapAPI();
 
-    const { get, subscribe } = useSignal();
+    const { get, subscribe } = useMockSignal();
     const { init, findPosition } = usePosition();
     const socket = useSocket();
 
@@ -60,9 +60,9 @@ export default defineComponent({
             data.position
           )!;
 
+          console.log(data);
+
           const child = state.children.find((child) => child.id === data.id)!;
-          alert(state.children);
-          alert(data.id);
 
           child.position = {
             floorId: floor.floorId,
@@ -94,7 +94,6 @@ export default defineComponent({
                 markerId: state.position.marker.id,
               },
             });
-            unsubscribe();
           })
         );
 

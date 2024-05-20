@@ -32,13 +32,13 @@ export class UserGateway {
     @ConnectedSocket() socket: WebSocket,
   ) {
     const { id, buildingId, markerId, target } = body;
+    console.log(id, Object.keys(this.clients));
     if (this.clients[id] === undefined) {
+      console.log('asdf');
       this.clients[id] = {
         position: markerId,
         socket,
       };
-
-      console.log(this.clients);
 
       target.forEach((targetId) => {
         const client = this.clients[targetId];
@@ -70,7 +70,8 @@ export class UserGateway {
     socket: WebSocket,
     data: T,
   ) {
-    socket.send(JSON.stringify(data), () => {
+    socket.send(JSON.stringify(data), (err) => {
+      if (!err) return;
       for (const userId in this.clients) {
         if (this.clients[userId].socket.url === socket.url) {
           delete this.clients[userId];

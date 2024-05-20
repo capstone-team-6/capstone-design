@@ -2,7 +2,7 @@ import { useMapAPI } from "@/apis/map";
 import { useUserAPI } from "@/apis/user";
 import { AppHeader } from "@/components/AppHeader";
 import { usePosition } from "@/composables/position";
-import { useSignal } from "@/composables/signal";
+import { useMockSignal } from "@/composables/signal.mock";
 import { useSocket } from "@/composables/socket";
 import { useAuthStore } from "@/stores/auth";
 import { defineComponent, reactive } from "vue";
@@ -15,7 +15,7 @@ export default defineComponent({
     const { listUsers } = useUserAPI();
     const { findBuilding } = useMapAPI();
 
-    const { get, subscribe } = useSignal();
+    const { get, subscribe } = useMockSignal(true);
     const { init, findPosition } = usePosition();
     const socket = useSocket();
 
@@ -30,6 +30,8 @@ export default defineComponent({
           throw new Error(result.message);
         }
         const building = result.data;
+
+        socket.subscribe(console.log);
 
         subscribe((signals) =>
           findPosition(signals).then((markerId) => {
