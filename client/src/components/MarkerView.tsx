@@ -25,7 +25,6 @@ export default defineComponent({
   },
   emits: ["event:buttonClick"],
   setup(props, { emit }) {
-    const position = ref(props.position);
     const isClick = ref(false);
 
     const markerName = ref(props.marker.markerName);
@@ -44,8 +43,8 @@ export default defineComponent({
       <div>
         <div
           style={{
-            left: `${position.value.x}px`,
-            top: `${position.value.y}px`,
+            left: `${props.position.x}px`,
+            top: `${props.position.y}px`,
           }}
           class="absolute flex flex-col items-center justify-center"
         >
