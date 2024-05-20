@@ -13,8 +13,6 @@ export const useSocket = () => {
     import.meta.env.VITE_SERVER_URL.replace(/http|https/, "ws")
   );
   const authStore = useAuthStore();
-  const id = authStore.context.user!.id;
-  const target = authStore.context.user!.group;
 
   const init = (): Promise<void> => {
     return new Promise((resolve) => {
@@ -29,8 +27,8 @@ export const useSocket = () => {
       JSON.stringify({
         event: message.event,
         data: {
-          id,
-          target,
+          id: authStore.context.user!.id,
+          target: authStore.context.user!.group,
           ...message.data,
         },
       })
@@ -39,6 +37,7 @@ export const useSocket = () => {
 
   const subscribe = <T>(callback: (data: T) => any) => {
     socket.onmessage = (event) => {
+      alert(event.data);
       callback(JSON.parse(event.data));
     };
   };

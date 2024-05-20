@@ -52,6 +52,8 @@ export class UserGateway {
       });
     }
 
+    this.clients[id].position = markerId;
+
     target.forEach((targetId) => {
       const client = this.clients[targetId];
       if (client !== undefined) {
@@ -69,6 +71,13 @@ export class UserGateway {
     socket: WebSocket,
     data: T,
   ) {
-    socket.send(JSON.stringify(data));
+    socket.send(JSON.stringify(data), () => {
+      for (const userId in this.clients) {
+        if (this.clients[userId].socket.url === socket.url) {
+          delete this.clients[userId];
+          return;
+        }
+      }
+    });
   }
 }

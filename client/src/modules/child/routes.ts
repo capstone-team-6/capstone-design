@@ -7,6 +7,7 @@ import ID from "./pages/ID";
 export const childRoutes: RouteRecordRaw[] = [
   {
     path: "/child",
+    beforeEnter: [authGuard],
     children: [
       {
         path: "",
@@ -17,7 +18,6 @@ export const childRoutes: RouteRecordRaw[] = [
         path: "id",
         component: ID,
         name: ChlidRoute.ID,
-        beforeEnter: [authGuard],
       },
     ],
   },

@@ -21,6 +21,7 @@ export default defineComponent({
 
     socket
       .init()
+      .then(() => alert("success"))
       .then(() => get())
       .then((signals) => init(signals))
       .then((buildingId) => findBuilding({ buildingId }, {}))
@@ -31,14 +32,17 @@ export default defineComponent({
         const building = result.data;
 
         subscribe((signals) =>
-          findPosition(signals).then((markerId) =>
+          findPosition(signals).then((markerId) => {
             socket.send({
               event: "position",
               data: { buildingId: building.buildingId, markerId },
-            })
-          )
+            });
+
+            state.position = markerId + Math.random().toFixed(2);
+          })
         );
-      });
+      })
+      .catch((e) => alert(e));
 
     listUsers({}, {}, { ids: authStore.context.user!.group }).then((result) => {
       if (!result.success) {
@@ -50,6 +54,7 @@ export default defineComponent({
 
     const state = reactive({
       guardian: [] as User[],
+      position: "",
     });
 
     return () => {
@@ -57,7 +62,9 @@ export default defineComponent({
         <div>
           <AppHeader name={authStore.context.user?.name ?? ""} />
           <div class="mt-12">
+            <div>{state.position}</div>
             <div>연결된 목록</div>
+
             {state.guardian.map((user) => (
               <div>{user.name}</div>
             ))}

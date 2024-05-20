@@ -42,7 +42,7 @@ export default defineComponent({
           }));
         }
       ),
-      socket.init(),
+      socket.init().then(() => alert("success")),
     ])
       .then(() => get())
       .then((signals) => init(signals))
@@ -55,7 +55,6 @@ export default defineComponent({
         state.building = result.data;
 
         socket.subscribe<{ id: string; position: string }>((data) => {
-          console.log(data);
           const { floor, marker } = getPosition(
             state.building!,
             data.position
