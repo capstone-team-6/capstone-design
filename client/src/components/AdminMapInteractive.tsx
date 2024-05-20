@@ -99,9 +99,8 @@ export default defineComponent({
         onEvent:contextmenu={onRightClick}
       >
         {floorRef.value &&
-          floorRef.value.QRMarker.map((marker, index) => (
+          floorRef.value.QRMarker.map((marker) => (
             <MarkerComponet
-              key={index}
               imageSrc={markerImg.src}
               position={{ x: marker.xLocation, y: marker.yLocation }}
               marker={marker}
