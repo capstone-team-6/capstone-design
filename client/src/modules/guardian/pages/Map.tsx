@@ -60,7 +60,11 @@ export default defineComponent({
             data.position
           )!;
 
-          state.children.find((child) => child.id === data.id)!.position = {
+          const child = state.children.find((child) => child.id === data.id)!;
+          alert(state.children);
+          alert(data.id);
+
+          child.position = {
             floorId: floor.floorId,
             marker: {
               id: marker.markerId,
@@ -90,6 +94,7 @@ export default defineComponent({
                 markerId: state.position.marker.id,
               },
             });
+            unsubscribe();
           })
         );
 

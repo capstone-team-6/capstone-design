@@ -38,8 +38,7 @@ export class UserGateway {
         socket,
       };
 
-      console.log(body);
-      this.send(socket, { position: markerId, id });
+      console.log(this.clients);
 
       target.forEach((targetId) => {
         const client = this.clients[targetId];

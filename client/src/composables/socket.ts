@@ -23,6 +23,7 @@ export const useSocket = () => {
   };
 
   const send = <T extends Message>(message: T) => {
+    alert(authStore.context.user!.id);
     socket.send(
       JSON.stringify({
         event: message.event,
@@ -37,7 +38,6 @@ export const useSocket = () => {
 
   const subscribe = <T>(callback: (data: T) => any) => {
     socket.onmessage = (event) => {
-      alert(event.data);
       callback(JSON.parse(event.data));
     };
   };
