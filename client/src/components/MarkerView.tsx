@@ -18,10 +18,6 @@ export default defineComponent({
       type: Object as PropType<Marker>,
       required: true,
     },
-    isAdmin: {
-      type: Boolean,
-      default: false,
-    },
   },
   emits: ["event:buttonClick"],
   setup(props, { emit }) {
@@ -51,11 +47,7 @@ export default defineComponent({
           <img
             onMousedown={onMouseDown}
             src={props.imageSrc}
-            class={
-              props.isAdmin
-                ? "cursor-default hover:brightness-75 transition duration-300 ease-in-out"
-                : "transition duration-300 ease-in-out"
-            }
+            class="cursor-default hover:brightness-75 transition duration-300 ease-in-out"
           />
           <p class="bg-white px-2">{props.marker.markerName}</p>
         </div>
@@ -118,6 +110,8 @@ export default defineComponent({
                 }
 
                 emit("event:buttonClick", building.data);
+
+                nearNodeId.value = "";
               }}
             >
               인접 노드 등록
