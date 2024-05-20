@@ -1,22 +1,25 @@
-import { getAuth } from "firebase/auth";
-import { defineComponent, reactive } from "vue";
+import { defineComponent } from "vue";
 import { RouterView } from "vue-router";
-import { firebaseApp } from "./utils/firebase";
+import { useAuthStore } from "./stores/auth";
 
 export default defineComponent({
   name: "App",
   setup() {
-    const auth = getAuth(firebaseApp);
-    const state = reactive({
-      isAuthStateReady: false,
-    });
-
-    auth.authStateReady().then(() => (state.isAuthStateReady = true));
+    const authStore = useAuthStore();
+    authStore.init();
 
     return () => {
-      if (!state.isAuthStateReady) return <div>로그인 정보 확인 중</div>;
-
-      return <RouterView />;
+      return (
+        <div class="w-full max-w-sm mx-auto">
+          {authStore.context.state === "init" ? (
+            <div>로그인 정보 확인 중</div>
+          ) : authStore.context.state === "check" ? (
+            <div>유저 정보 확인 중</div>
+          ) : (
+            <RouterView />
+          )}
+        </div>
+      );
     };
   },
 });
