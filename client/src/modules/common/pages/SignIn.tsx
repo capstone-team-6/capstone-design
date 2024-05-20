@@ -1,15 +1,10 @@
 import { AppButton } from "@/components/AppButton";
 import { useAuthStore } from "@/stores/auth";
 import { computed, defineComponent } from "vue";
-import {
-  LocationQueryValue,
-  RouterLink,
-  useRoute,
-  useRouter,
-} from "vue-router";
+import { RouterLink, useRoute, useRouter } from "vue-router";
 import { User } from "~/entities/user";
 
-import { CommonRoute } from "@/routers/route";
+import { ChlidRoute, CommonRoute, GuardianRoute } from "@/routers/route";
 import { typeLabel } from "../utils/type";
 
 export default defineComponent({
@@ -27,8 +22,8 @@ export default defineComponent({
 
     authStore.$subscribe(
       (_, store) => {
-        const { state } = store.context;
-        console.log(state);
+        const { state, user } = store.context;
+
         if (state === "empty")
           return router.replace({
             name: CommonRoute.SIGN_UP,
@@ -36,8 +31,13 @@ export default defineComponent({
           });
 
         if (state === "signIn") {
-          const next = route.query.next as LocationQueryValue;
-          return router.replace(next ?? "/");
+          if (user.type === "child") {
+            return router.replace({ name: ChlidRoute.INDEX });
+          }
+
+          if (user.type === "guardian") {
+            return router.replace({ name: GuardianRoute.MAP });
+          }
         }
       },
       { immediate: true }

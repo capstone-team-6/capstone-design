@@ -1,5 +1,5 @@
 import { FingerprintDTO } from '../dtos/fingerprint';
-import { Fingerprint } from '../entities/fingerprint';
+import { APSignal, Fingerprint } from '../entities/fingerprint';
 import { DefineAPI } from './type';
 
 export type FingerprintAPI = DefineAPI<{
@@ -10,7 +10,7 @@ export type FingerprintAPI = DefineAPI<{
     body: FingerprintDTO.Register;
     response: Fingerprint;
   };
-  find: {
+  list: {
     method: 'GET';
     basePath: '/api/fingerprint';
     path: 'find';
@@ -18,14 +18,13 @@ export type FingerprintAPI = DefineAPI<{
     query: ['buildingId', 'markerId'];
     response: Fingerprint[];
   };
-  findPosition: {
+  findBuilding: {
     method: 'POST';
     basePath: '/api/fingerprint';
-    path: 'find-position';
-    body: Pick<Fingerprint, 'buildingId' | 'signals'>;
-    response: {
-      markerId: Fingerprint['markerId'];
-      distance: number;
+    path: 'find-building';
+    body: {
+      apList: APSignal[];
     };
+    response: string;
   };
 }>;

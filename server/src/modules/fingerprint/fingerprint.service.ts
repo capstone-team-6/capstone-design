@@ -24,6 +24,25 @@ export class FingerprintService {
     return await this.db.fingerprints.find(filter).toArray();
   }
 
+  async findBuilding(apSignals: APSignal[]): Promise<string> {
+    const batch = 5;
+
+    apSignals.sort((a, b) => b.level - a.level);
+
+    for (let i = 0; i < apSignals.length; i += batch) {
+      const targetIds = apSignals
+        .slice(i, i + batch)
+        .map((signal) => signal.BSSID);
+      const result = await this.db.fingerprints.findOne({
+        'signals.BSSID': { $in: targetIds },
+      });
+
+      if (result !== null) return result.buildingId;
+    }
+
+    throw new Error('Cannot find building');
+  }
+
   async findNearestMarker(buildingId: string, signals: APSignal[]) {
     const fingerprints = await this.db.fingerprints
       .find({ buildingId })

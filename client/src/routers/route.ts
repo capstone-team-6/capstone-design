@@ -14,4 +14,5 @@ export enum AdminRoute {
 
 export enum GuardianRoute {
   PAIR = "pair",
+  MAP = "map",
 }

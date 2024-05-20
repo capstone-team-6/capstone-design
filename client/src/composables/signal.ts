@@ -4,22 +4,19 @@ import { APSignal } from "~/entities/fingerprint";
 export const useSignal = () => {
   const scan = () => (window as any).Bridge.startScan();
 
-  const subscribe = (
-    callback: (signal: APSignal[]) => any,
-    scanRate: number
-  ) => {
+  const subscribe = (callback: (signal: APSignal[]) => any) => {
     const isLoading = ref(false);
-    let timeoutHandle: NodeJS.Timeout;
+    let isContinue = true;
 
     const handler = (event: MessageEvent) => {
       isLoading.value = false;
       const data = JSON.parse(event.data);
       callback(data);
 
-      timeoutHandle = setTimeout(() => {
+      if (isContinue) {
         isLoading.value = true;
         scan();
-      }, scanRate);
+      }
     };
 
     window.addEventListener("message", handler);
@@ -27,7 +24,7 @@ export const useSignal = () => {
     scan();
 
     const unsubscribe = () => {
-      clearTimeout(timeoutHandle);
+      isContinue = false;
       window.removeEventListener("message", handler);
     };
 

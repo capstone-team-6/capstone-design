@@ -6,7 +6,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { FingerprintModule } from './fingerprint/fingerprint.module';
 import { MapModule } from './map/map.module';
-import { UserModule } from './user/user,module';
+import { UserModule } from './user/user.module';
 import { UtilModule } from './util/util.module';
 
 @Module({

@@ -1,6 +1,6 @@
 import { PropType, defineComponent } from "vue";
 
-type IconType = "chevron-down" | "user" | "bars" | "copy";
+type IconType = "chevron-down" | "user" | "bars" | "copy" | "marker";
 
 export const Icon = defineComponent({
   name: "Icon",
@@ -78,6 +78,33 @@ export const Icon = defineComponent({
               stroke-linejoin="round"
               d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m3.75 9v6m3-3H9m1.5-12H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"
             />
+          </svg>
+        );
+      }
+
+      if (props.type === "marker") {
+        return (
+          <svg
+            width="72px"
+            height="72px"
+            viewBox="0 0 1024 1024"
+            class="icon"
+            version="1.1"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="#000000"
+          >
+            <g id="SVGRepo_bgCarrier" stroke-width="0" />
+            <g
+              id="SVGRepo_tracerCarrier"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+            <g id="SVGRepo_iconCarrier">
+              <path
+                d="M512 85.333333c-164.949333 0-298.666667 133.738667-298.666667 298.666667 0 164.949333 298.666667 554.666667 298.666667 554.666667s298.666667-389.717333 298.666667-554.666667c0-164.928-133.717333-298.666667-298.666667-298.666667z m0 448a149.333333 149.333333 0 1 1 0-298.666666 149.333333 149.333333 0 0 1 0 298.666666z"
+                fill="#e32400"
+              />
+            </g>
           </svg>
         );
       }
