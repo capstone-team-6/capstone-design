@@ -61,22 +61,32 @@ export default defineComponent({
           }
         ).then(
           // Floor 객체 업데이트
-          (result) =>
-            (floorRef.value = result.floors.find(
+          (result) => {
+            if (!result.success) {
+              console.error(result.message);
+              return;
+            }
+
+            floorRef.value = result.data.floors.find(
               (floor) => floor.floorId === props.floorId
-            ))
+            );
+          }
         );
       }
     };
 
     // Floor 객체 찾기
     const findFloor = () => {
-      findBuilding({ buildingId: props.buildingId }, {}).then(
-        (result) =>
-          (floorRef.value = result.floors.find(
-            (floor) => floor.floorId === props.floorId
-          ))
-      );
+      findBuilding({ buildingId: props.buildingId }, {}).then((result) => {
+        if (!result.success) {
+          console.error(result.message);
+          return;
+        }
+
+        floorRef.value = result.data.floors.find(
+          (floor) => floor.floorId === props.floorId
+        );
+      });
     };
 
     // Floor 업데이트

@@ -83,7 +83,13 @@ export default defineComponent({
                     markerName: markerName.value,
                   }
                 );
-                emit("event:buttonClick", building);
+
+                if (!building.success) {
+                  console.error(building.message);
+                  return;
+                }
+
+                emit("event:buttonClick", building.data);
               }}
             >
               마커 이름 등록
@@ -105,7 +111,13 @@ export default defineComponent({
                     secondNode: nearNodeId.value,
                   }
                 );
-                emit("event:buttonClick", building);
+
+                if (!building.success) {
+                  console.error(building.message);
+                  return;
+                }
+
+                emit("event:buttonClick", building.data);
               }}
             >
               인접 노드 등록
