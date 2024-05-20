@@ -15,7 +15,7 @@ import { UtilModule } from './util/util.module';
       validationSchema: Joi.object<Config>({
         DB_NAME: Joi.string().required(),
         DB_URL: Joi.string().required(),
-        GOOGLE_APPLICATION_CREDENTIALS: Joi.string().optional(),
+        // GOOGLE_APPLICATION_CREDENTIALS: Joi.string().optional(),
       }),
     }),
     UtilModule,
