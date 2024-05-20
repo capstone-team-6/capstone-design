@@ -1,4 +1,6 @@
-import { PropType, defineComponent, onMounted, onUnmounted, ref } from "vue";
+import { useMapAPI } from "@/apis/map";
+import { PropType, defineComponent, ref } from "vue";
+import { Marker } from "~/entities/map";
 import QRGenerate from "./QRGenerate";
 
 export default defineComponent({
@@ -12,22 +14,19 @@ export default defineComponent({
       type: Object as PropType<{ x: number; y: number }>,
       required: true,
     },
-    markerId: {
-      type: String,
+    marker: {
+      type: Object as PropType<Marker>,
       required: true,
     },
-    isAdmin: {
-      type: Boolean,
-      default: false,
-    },
   },
-  components: {
-    QRGenerate,
-  },
-  setup(props) {
-    const markerRef = ref<HTMLImageElement | null>(null);
-    const position = ref(props.position);
+  emits: ["event:buttonClick"],
+  setup(props, { emit }) {
     const isClick = ref(false);
+
+    const markerName = ref(props.marker.markerName);
+    const nearNodeId = ref("");
+
+    const { combineNearNode, updateMarkerName } = useMapAPI();
 
     const onMouseDown = (event: MouseEvent) => {
       event.stopPropagation();
@@ -36,40 +35,98 @@ export default defineComponent({
       isClick.value = !isClick.value; // 마커 클릭시 큐알코드 보여줌
     };
 
-    onMounted(() => {
-      if (markerRef.value && props.isAdmin) {
-        markerRef.value.addEventListener("mousedown", onMouseDown);
-      }
-    });
-
-    onUnmounted(() => {
-      if (markerRef.value && props.isAdmin) {
-        markerRef.value.removeEventListener("mousedown", onMouseDown);
-      }
-    });
-
     return () => (
       <div>
-        <img
-          ref={markerRef}
-          src={props.imageSrc}
-          class={
-            props.isAdmin
-              ? "absolute cursor-default hover:brightness-75 transition duration-300 ease-in-out"
-              : "absolute transition duration-300 ease-in-out"
-          }
+        <div
           style={{
-            left: `${position.value.x}px`,
-            top: `${position.value.y}px`,
+            left: `${props.position.x}px`,
+            top: `${props.position.y}px`,
           }}
-        />
+          class="absolute flex flex-col items-center justify-center"
+        >
+          <img
+            onMousedown={onMouseDown}
+            src={props.imageSrc}
+            class="cursor-default hover:brightness-75 transition duration-300 ease-in-out"
+          />
+          <p class="bg-white px-2">{props.marker.markerName}</p>
+        </div>
         {isClick.value && (
-          <div>
-            <QRGenerate data={props.markerId} />
-            <p class="bg-white">{props.markerId}</p>
+          <div
+            class="fixed top-0 right-0 h-full w-64 bg-gray-200 p-3"
+            onMousedown={(e) => e.stopPropagation()}
+          >
+            <QRGenerate data={props.marker.markerId} />
+            <p class="mb-2">{props.marker.markerId}</p>
+            <input
+              type="text"
+              value={markerName.value}
+              onInput={(e) =>
+                (markerName.value = (e.target as HTMLInputElement).value)
+              }
+            />
+            <button
+              onClick={async () => {
+                const building = await updateMarkerName(
+                  {},
+                  {},
+                  {
+                    markerId: props.marker.markerId,
+                    markerName: markerName.value,
+                  }
+                );
+
+                if (!building.success) {
+                  console.error(building.message);
+                  return;
+                }
+
+                emit("event:buttonClick", building.data);
+              }}
+            >
+              마커 이름 등록
+            </button>
+            <input
+              type="text"
+              value={nearNodeId.value}
+              onInput={(e) => {
+                nearNodeId.value = (e.target as HTMLInputElement).value;
+              }}
+            />
+            <button
+              onClick={async () => {
+                const building = await combineNearNode(
+                  {},
+                  {},
+                  {
+                    firstNode: props.marker.markerId,
+                    secondNode: nearNodeId.value,
+                  }
+                );
+
+                if (!building.success) {
+                  console.error(building.message);
+                  return;
+                }
+
+                emit("event:buttonClick", building.data);
+
+                nearNodeId.value = "";
+              }}
+            >
+              인접 노드 등록
+            </button>
+            <button
+              class="flex flex-col mt-2"
+              onClick={() => (isClick.value = false)}
+            >
+              닫기
+            </button>
           </div>
         )}
       </div>
     );
+    // TODO:
+    // 마커 삭제
   },
 });
