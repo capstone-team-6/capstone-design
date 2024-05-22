@@ -1,27 +1,22 @@
-import { defineComponent, ref } from "vue";
+import { PropType, defineComponent, ref } from "vue";
 
 export default defineComponent({
   name: "MapComponent",
   props: {
-    buildingId: {
-      type: String,
-      required: true,
-    },
-    floorId: {
-      type: String,
-      required: true,
-    },
-    // 어드민인 경우에만 마커 추가, 편집 가능
     mapImageURL: {
       type: String,
       required: true,
+    },
+    startPosition: {
+      type: Object as PropType<{ x: number; y: number }>,
+      default: { x: 0, y: 0 },
     },
   },
   emits: ["event:contextmenu"],
   setup(props, { slots, emit, expose }) {
     const mapRef = ref<HTMLDivElement | null>(null);
     const position = ref({ x: 0, y: 0 });
-    let start = { x: 0, y: 0 };
+    let start = props.startPosition;
     let dragging = false;
 
     const startDrag = (x: number, y: number) => {

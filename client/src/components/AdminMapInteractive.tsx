@@ -1,7 +1,7 @@
 import { useMapAPI } from "@/apis/map";
 import blueMarkerImgSrc from "@/assets/blue_marker.svg";
 import redMarkerImgSrc from "@/assets/red_marker.svg";
-import { defineComponent, onMounted, ref } from "vue";
+import { defineComponent, onMounted, onUpdated, ref } from "vue";
 import { Building, Floor, Marker } from "~/entities/map";
 import MapComponet from "./MapView";
 import MarkerComponet from "./MarkerView";
@@ -25,12 +25,6 @@ export default defineComponent({
 
     const { findBuilding, registerQRMarker, registerNodeMarker } = useMapAPI();
 
-    const QRMarkerImg = new Image();
-    QRMarkerImg.src = redMarkerImgSrc;
-
-    const nodeMarkerImg = new Image();
-    nodeMarkerImg.src = blueMarkerImgSrc;
-
     const markerMode = ref<"QR" | "node">("QR"); // 어떠한 마커를 추가할 것인지
 
     // 우클릭인 경우 마커 추가
@@ -40,18 +34,18 @@ export default defineComponent({
       if (mapRef.value) {
         const rect = mapRef.value.getBoundingClientRect();
 
+        const x = event.clientX - rect.left;
+        const y = event.clientY - rect.top;
+
+        // 마커 객체 생성
+        const newMarker: Omit<Marker, "markerId"> = {
+          markerName: "",
+          xLocation: x,
+          yLocation: y,
+          nearNodeId: [],
+        };
+
         if (markerMode.value === "QR") {
-          const x = event.clientX - rect.left - QRMarkerImg.width / 2; // 클릭 위치와 마커 위치 맞춤
-          const y = event.clientY - rect.top - QRMarkerImg.height;
-
-          // 마커 객체 생성
-          const newQRMarker: Omit<Marker, "markerId"> = {
-            markerName: "",
-            xLocation: x,
-            yLocation: y,
-            nearNodeId: [],
-          };
-
           // 마커 등록
           registerQRMarker(
             {},
@@ -59,7 +53,7 @@ export default defineComponent({
             {
               buildingId: props.buildingId,
               floorId: props.floorId,
-              marker: newQRMarker,
+              marker: newMarker,
             }
           ).then(
             // Floor 객체 업데이트
@@ -73,17 +67,6 @@ export default defineComponent({
             }
           );
         } else {
-          const x = event.clientX - rect.left - nodeMarkerImg.width / 2; // 클릭 위치와 마커 위치 맞춤
-          const y = event.clientY - rect.top - nodeMarkerImg.height;
-
-          // 마커 객체 생성
-          const newNodeMarker: Omit<Marker, "markerId"> = {
-            markerName: "",
-            xLocation: x,
-            yLocation: y,
-            nearNodeId: [],
-          };
-
           // 마커 등록
           registerNodeMarker(
             {},
@@ -91,7 +74,7 @@ export default defineComponent({
             {
               buildingId: props.buildingId,
               floorId: props.floorId,
-              marker: newNodeMarker,
+              marker: newMarker,
             }
           ).then(
             // Floor 객체 업데이트
@@ -131,9 +114,15 @@ export default defineComponent({
       findFloor(); // 컴포넌트 마운트 후 플로어 객체 찾기
     });
 
+    onUpdated(() => {
+      findFloor(); // 업데이트 후 플로어 객체 찾기
+    });
+
     return () => (
       <div>
-        <p>{markerMode.value === "QR" ? "QR mode" : "Node mode"}</p>
+        <p class="border-2 border-gray-300">
+          {markerMode.value === "QR" ? "QR mode" : "Node mode"}
+        </p>
         <button
           onClick={() => {
             if (markerMode.value === "QR") {
@@ -147,15 +136,13 @@ export default defineComponent({
         </button>
         <MapComponet
           ref={mapRef}
-          buildingId={props.buildingId}
-          floorId={props.floorId}
           mapImageURL={floorRef.value ? floorRef.value.mapImageURL : ""}
           onEvent:contextmenu={onRightClick}
         >
           {floorRef.value &&
             floorRef.value.QRMarker.map((marker) => (
               <MarkerComponet
-                imageSrc={QRMarkerImg.src}
+                imageSrc={redMarkerImgSrc}
                 position={{ x: marker.xLocation, y: marker.yLocation }}
                 marker={marker}
                 onEvent:buttonClick={updateFloor}
@@ -173,7 +160,5 @@ export default defineComponent({
         </MapComponet>
       </div>
     );
-    // TODO:
-    // qr마커와 노드 마커 중 선택 버튼
   },
 });
