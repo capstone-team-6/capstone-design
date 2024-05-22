@@ -23,13 +23,14 @@ export default defineComponent({
           left: `${props.position.x}px`,
           top: `${props.position.y}px`,
         }}
-        class="absolute flex flex-col items-center justify-center"
+        class="absolute"
       >
-        <img src={props.imageSrc} class="transition duration-300 ease-in-out" />
+        <img
+          src={props.imageSrc}
+          class="transition duration-300 ease-in-out -translate-x-1/2 -translate-y-full"
+        />
         {props.usersName.map((userName) => (
-          <p class="bg-white px-2">
-            {userName}
-          </p>
+          <p class="bg-white px-2 -translate-x-9 -translate-y-16">{userName}</p>
         ))}
       </div>
     );

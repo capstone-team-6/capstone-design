@@ -42,18 +42,20 @@ export default defineComponent({
             left: `${props.position.x}px`,
             top: `${props.position.y}px`,
           }}
-          class="absolute flex flex-col items-center justify-center"
+          class="absolute"
         >
           <img
             onMousedown={onMouseDown}
             src={props.imageSrc}
-            class="cursor-default hover:brightness-75 transition duration-300 ease-in-out"
+            class="cursor-default hover:brightness-75 transition duration-300 ease-in-out -translate-x-1/2 -translate-y-full"
           />
-          <p class="bg-white px-2">{props.marker.markerName}</p>
+          <p class="bg-white px-2 -translate-x-9 -translate-y-16">
+            {props.marker.markerName}
+          </p>
         </div>
         {isClick.value && (
           <div
-            class="fixed top-0 right-0 h-full w-64 bg-gray-200 p-3"
+            class="fixed top-0 left-0 h-full w-64 bg-gray-200 p-3"
             onMousedown={(e) => e.stopPropagation()}
           >
             <QRGenerate data={props.marker.markerId} />
