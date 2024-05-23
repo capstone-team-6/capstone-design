@@ -1,6 +1,6 @@
 import { useFingerprintAPI } from "@/apis/fingerprint";
 import Spinner from "@/components/Spinner";
-import { defineComponent, reactive, ref, nextTick } from "vue";
+import { defineComponent, nextTick, reactive, ref } from "vue";
 import { QrcodeStream } from "vue-qrcode-reader";
 import { APSignal } from "~/entities/fingerprint";
 import { useSignal } from "../../../composables/signal";
@@ -41,7 +41,7 @@ export default defineComponent({
       await scan();
       await register({}, {}, input);
       await find({ markerId: input.markerId }, {}).then(
-        (result) => (markerCnt.value = result.length)
+        (result) => result.success && (markerCnt.value = result.data.length)
       );
       state.isLoading = false;
       successedMarkerId.value = content[0].rawValue;
