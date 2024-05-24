@@ -49,6 +49,22 @@ export default defineComponent({
         onLoadstart={onImgLoadStart}
         onLoad={onImgLoad}
       >
+        <p style={{
+          transform: `translate(485px, 15px)`,
+        }}
+        class="text-2xl absolute">UP</p>
+        <p style={{
+          transform: `translate(430px, 15px)`,
+        }}
+        class="text-2xl absolute">DN</p>
+        <p style={{
+          transform: `translate(1520px, 15px)`,
+        }}
+        class="text-2xl absolute">UP</p>
+        <p style={{
+          transform: `translate(1465px, 15px)`,
+        }}
+        class="text-2xl absolute">DN</p>
         {slots.default ? slots.default() : null}
       </div>
     );

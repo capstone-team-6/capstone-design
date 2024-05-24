@@ -10,34 +10,38 @@ export default defineComponent({
     const inputBuildingId = ref(buildingId.value);
     return () => (
       <div>
-        <input
-          type="text"
-          value={buildingId.value}
-          onInput={(e) =>
-            (inputBuildingId.value = (e.target as HTMLInputElement).value)
-          }
-          class="border-2 border-gray-300"
-        />
-        <button
-          onClick={() => (buildingId.value = inputBuildingId.value)}
-          class="pb-3"
-        >
-          빌딩 ID 저장
-        </button>
-        <input
-          type="text"
-          value={floorId.value}
-          onInput={(e) =>
-            (inputFloorId.value = (e.target as HTMLInputElement).value)
-          }
-          class="border-2 border-gray-300"
-        />
-        <button
-          onClick={() => (floorId.value = inputFloorId.value)}
-          class="pb-3"
-        >
-          floor ID 저장
-        </button>
+        {true && (
+          <div>
+            <input
+              type="text"
+              value={buildingId.value}
+              onInput={(e) =>
+                (inputBuildingId.value = (e.target as HTMLInputElement).value)
+              }
+              class="border-2 border-gray-300"
+            />
+            <button
+              onClick={() => (buildingId.value = inputBuildingId.value)}
+              class="pb-3"
+            >
+              빌딩 ID 저장
+            </button>
+            <input
+              type="text"
+              value={floorId.value}
+              onInput={(e) =>
+                (inputFloorId.value = (e.target as HTMLInputElement).value)
+              }
+              class="border-2 border-gray-300"
+            />
+            <button
+              onClick={() => (floorId.value = inputFloorId.value)}
+              class="pb-3"
+            >
+              floor ID 저장
+            </button>
+          </div>
+        )}
         <InteractiveMap buildingId={buildingId.value} floorId={floorId.value} />
       </div>
     );

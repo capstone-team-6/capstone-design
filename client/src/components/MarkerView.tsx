@@ -1,3 +1,4 @@
+import { useFingerprintAPI } from "@/apis/fingerprint";
 import { useMapAPI } from "@/apis/map";
 import { PropType, defineComponent, ref } from "vue";
 import { Marker } from "~/entities/map";
@@ -25,8 +26,10 @@ export default defineComponent({
 
     const markerName = ref(props.marker.markerName);
     const nearNodeId = ref("");
+    const markerCnt = ref(0);
 
     const { combineNearNode, updateMarkerName } = useMapAPI();
+    const { find } = useFingerprintAPI();
 
     const onMouseDown = (event: MouseEvent) => {
       event.stopPropagation();
@@ -34,6 +37,14 @@ export default defineComponent({
 
       isClick.value = !isClick.value; // 마커 클릭시 큐알코드 보여줌
     };
+
+    const getFingerprintCnt = async () => {
+      await find({ markerId: props.marker.markerId }, {}).then(
+        (result) => result.success && (markerCnt.value = result.data.length)
+      );
+    };
+
+    getFingerprintCnt();
 
     return () => (
       <div>
@@ -55,12 +66,13 @@ export default defineComponent({
         </div>
         {isClick.value && (
           <div
-            class="fixed top-0 left-0 h-full w-64 bg-gray-200 p-3"
+            class="max-w-md mx-auto fixed top-0 left-0 h-full w-64 bg-gray-200 p-3"
             onMousedown={(e) => e.stopPropagation()}
           >
             <QRGenerate data={props.marker.markerId} />
             <p class="mb-2">{props.marker.markerId}</p>
             <input
+              class="w-full"
               type="text"
               value={markerName.value}
               onInput={(e) =>
@@ -86,9 +98,10 @@ export default defineComponent({
                 emit("event:buttonClick", building.data);
               }}
             >
-              마커 이름 등록
+              [마커 이름 등록]
             </button>
             <input
+              class="w-full"
               type="text"
               value={nearNodeId.value}
               onInput={(e) => {
@@ -116,13 +129,17 @@ export default defineComponent({
                 nearNodeId.value = "";
               }}
             >
-              인접 노드 등록
+              [인접 노드 등록]
+            </button>
+            <p class="mt-2">현재 Fingerprint 개수 - {markerCnt.value}</p>
+            <button class="flex flex-col" onClick={getFingerprintCnt}>
+              [Fingerprint info 새로고침]
             </button>
             <button
               class="flex flex-col mt-2"
               onClick={() => (isClick.value = false)}
             >
-              닫기
+              [닫기]
             </button>
           </div>
         )}
