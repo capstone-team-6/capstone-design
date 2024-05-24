@@ -10,7 +10,7 @@ export default defineComponent({
     const inputBuildingId = ref(buildingId.value);
     return () => (
       <div>
-        {true && (
+        {false && (
           <div>
             <input
               type="text"

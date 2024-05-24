@@ -120,7 +120,7 @@ export default defineComponent({
 
     return () => (
       <div>
-        {true && (
+        {false && (
           <div>
             <p class="border-2 border-gray-300">
               {markerMode.value === "QR" ? "QR mode" : "Node mode"}
