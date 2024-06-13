@@ -23,11 +23,11 @@ export default defineComponent({
       type: Object as PropType<Building>,
       required: true,
     },
-    myMarkerId: {
+    markerId: {
       type: String,
       required: true,
     },
-    childs: {
+    children: {
       type: Object as PropType<{ name: string; markerId: string }[]>,
       required: true,
     },
@@ -39,13 +39,11 @@ export default defineComponent({
   setup(props) {
     const floorRef = computed(() =>
       props.building.floors.find((floor) =>
-        floor.QRMarker.find(
-          (QRMarker) => QRMarker.markerId === props.myMarkerId
-        )
+        floor.QRMarker.find((QRMarker) => QRMarker.markerId === props.markerId)
       )
     );
 
-    const groupChild = computed(() => _.groupBy(props.childs, "markerId"));
+    const groupChild = computed(() => _.groupBy(props.children, "markerId"));
 
     const canvasRef = ref<HTMLCanvasElement | null>(null);
 
@@ -59,9 +57,10 @@ export default defineComponent({
       if (canvasRef.value && props.target) {
         const path = useFindPath(
           props.building,
-          props.myMarkerId,
+          props.markerId,
           props.target.markerId
         );
+        console.log(path);
 
         const ctx = canvasRef.value.getContext("2d");
 
@@ -101,10 +100,11 @@ export default defineComponent({
       if (!marker) {
         return undefined;
       }
+
       return { x: marker.xLocation, y: marker.yLocation };
     };
 
-    const myPosition = computed(() => findMarkerPosition(props.myMarkerId));
+    const myPosition = computed(() => findMarkerPosition(props.markerId));
 
     const mapImgLoading = (isLoading: boolean) => {
       state.isLoading = isLoading;
@@ -124,48 +124,52 @@ export default defineComponent({
     return () => (
       state.isLoading && <Spinner />,
       (
-        <MapComponet
-          mapImageURL={floorRef.value ? floorRef.value.mapImageURL : ""}
-          startPosition={findMarkerPosition(props.myMarkerId)}
-          onLoad:img={mapImgLoading}
-        >
-          <canvas ref={canvasRef} width={2600} height={860}></canvas>
-          {_.keys(groupChild.value).map((markerId) => {
-            const markerPosition = findMarkerPosition(markerId);
+        <div class="w-full h-full overflow-scroll relative">
+          <MapComponet
+            mapImageURL={floorRef.value ? floorRef.value.mapImageURL : ""}
+            startPosition={findMarkerPosition(props.markerId)}
+            onLoad:img={mapImgLoading}
+          >
+            <canvas ref={canvasRef} width={2600} height={860}></canvas>
+            {_.keys(groupChild.value).map((markerId) => {
+              const markerPosition = findMarkerPosition(markerId);
 
-            if (
-              markerPosition &&
-              myPosition.value &&
-              markerPosition.x === myPosition.value.x &&
-              markerPosition.y === myPosition.value.y
-            ) {
-              isOverlap = true;
-            } else {
-              isOverlap = false;
-            }
+              if (
+                markerPosition &&
+                myPosition.value &&
+                markerPosition.x === myPosition.value.x &&
+                markerPosition.y === myPosition.value.y
+              ) {
+                isOverlap = true;
+              } else {
+                isOverlap = false;
+              }
 
-            return (
-              markerPosition && (
-                <UserMarker
-                  imageSrc={blueMarkerImgSrc}
-                  usersName={
-                    isOverlap
-                      ? ["-"].concat(_.map(groupChild.value[markerId], "name"))
-                      : _.map(groupChild.value[markerId], "name")
-                  }
-                  position={markerPosition}
-                ></UserMarker>
-              )
-            );
-          })}
-          {myPosition.value && (
-            <UserMarker
-              imageSrc={redMarkerImgSrc}
-              usersName={["[Me]"]}
-              position={myPosition.value}
-            ></UserMarker>
-          )}
-        </MapComponet>
+              return (
+                markerPosition && (
+                  <UserMarker
+                    imageSrc={blueMarkerImgSrc}
+                    usersName={
+                      isOverlap
+                        ? ["-"].concat(
+                            _.map(groupChild.value[markerId], "name")
+                          )
+                        : _.map(groupChild.value[markerId], "name")
+                    }
+                    position={markerPosition}
+                  ></UserMarker>
+                )
+              );
+            })}
+            {myPosition.value && (
+              <UserMarker
+                imageSrc={redMarkerImgSrc}
+                usersName={["[Me]"]}
+                position={myPosition.value}
+              ></UserMarker>
+            )}
+          </MapComponet>
+        </div>
       )
     );
   },

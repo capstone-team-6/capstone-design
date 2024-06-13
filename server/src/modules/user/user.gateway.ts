@@ -32,9 +32,8 @@ export class UserGateway {
     @ConnectedSocket() socket: WebSocket,
   ) {
     const { id, buildingId, markerId, target } = body;
-    console.log(id, Object.keys(this.clients));
+
     if (this.clients[id] === undefined) {
-      console.log('asdf');
       this.clients[id] = {
         position: markerId,
         socket,

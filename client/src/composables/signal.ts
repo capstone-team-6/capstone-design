@@ -2,6 +2,8 @@ import { ref } from "vue";
 import { APSignal } from "~/entities/fingerprint";
 
 export const useSignal = () => {
+  // if (window.isAndroid === undefined) return useMockSignal();
+
   const scan = () => (window as any).Bridge.startScan();
 
   const subscribe = (callback: (signal: APSignal[]) => any) => {

@@ -17,8 +17,8 @@ export const Sidebar = defineComponent({
         <Teleport to="body">
           <div
             class={[
-              "absolute inset-0 left-0 w-1/3",
-              props.show ? "bg-black opacity-20" : "bg-none -z-10",
+              "absolute inset-0 left-0 w-1/3 transition-opacity",
+              props.show ? "bg-black opacity-20" : "opacity-0 -z-10",
             ]}
             onClick={() => props.show && emit("close")}
           ></div>

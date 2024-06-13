@@ -1,6 +1,13 @@
 import { PropType, defineComponent } from "vue";
 
-type IconType = "chevron-down" | "user" | "bars" | "copy" | "marker";
+type IconType =
+  | "chevron-down"
+  | "user"
+  | "bars"
+  | "copy"
+  | "marker"
+  | "plus"
+  | "chevron-left";
 
 export const Icon = defineComponent({
   name: "Icon",
@@ -85,26 +92,50 @@ export const Icon = defineComponent({
       if (props.type === "marker") {
         return (
           <svg
-            width="72px"
-            height="72px"
-            viewBox="0 0 1024 1024"
-            class="icon"
-            version="1.1"
             xmlns="http://www.w3.org/2000/svg"
-            fill="#000000"
+            viewBox="0 0 24 24"
+            fill="currentColor"
+            class="size-6"
           >
-            <g id="SVGRepo_bgCarrier" stroke-width="0" />
-            <g
-              id="SVGRepo_tracerCarrier"
-              stroke-linecap="round"
-              stroke-linejoin="round"
+            <path
+              fill-rule="evenodd"
+              d="m11.54 22.351.07.04.028.016a.76.76 0 0 0 .723 0l.028-.015.071-.041a16.975 16.975 0 0 0 1.144-.742 19.58 19.58 0 0 0 2.683-2.282c1.944-1.99 3.963-4.98 3.963-8.827a8.25 8.25 0 0 0-16.5 0c0 3.846 2.02 6.837 3.963 8.827a19.58 19.58 0 0 0 2.682 2.282 16.975 16.975 0 0 0 1.145.742ZM12 13.5a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"
+              clip-rule="evenodd"
             />
-            <g id="SVGRepo_iconCarrier">
-              <path
-                d="M512 85.333333c-164.949333 0-298.666667 133.738667-298.666667 298.666667 0 164.949333 298.666667 554.666667 298.666667 554.666667s298.666667-389.717333 298.666667-554.666667c0-164.928-133.717333-298.666667-298.666667-298.666667z m0 448a149.333333 149.333333 0 1 1 0-298.666666 149.333333 149.333333 0 0 1 0 298.666666z"
-                fill="#e32400"
-              />
-            </g>
+          </svg>
+        );
+      }
+
+      if (props.type === "plus") {
+        return (
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="currentColor"
+            class="size-6"
+          >
+            <path
+              fill-rule="evenodd"
+              d="M12 3.75a.75.75 0 0 1 .75.75v6.75h6.75a.75.75 0 0 1 0 1.5h-6.75v6.75a.75.75 0 0 1-1.5 0v-6.75H4.5a.75.75 0 0 1 0-1.5h6.75V4.5a.75.75 0 0 1 .75-.75Z"
+              clip-rule="evenodd"
+            />
+          </svg>
+        );
+      }
+
+      if (props.type === "chevron-left") {
+        return (
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="currentColor"
+            class="size-6"
+          >
+            <path
+              fill-rule="evenodd"
+              d="M7.72 12.53a.75.75 0 0 1 0-1.06l7.5-7.5a.75.75 0 1 1 1.06 1.06L9.31 12l6.97 6.97a.75.75 0 1 1-1.06 1.06l-7.5-7.5Z"
+              clip-rule="evenodd"
+            />
           </svg>
         );
       }

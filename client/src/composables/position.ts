@@ -51,9 +51,13 @@ export const usePosition = () => {
 
   const toTensor = (signals: APSignal[]) => {
     return tf.tensor(
-      idVector.map(
-        (id) => signals.find((signal) => signal.BSSID === id)?.level ?? MIN_RSSI
-      )
+      idVector
+        .map(
+          (id) =>
+            signals.find((signal) => signal.BSSID === id)?.level ?? MIN_RSSI
+        )
+        .map((level) => Math.pow(10, level / 10) * 1000)
+        .map((level) => Math.log2(level))
     );
   };
 

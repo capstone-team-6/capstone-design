@@ -12,7 +12,7 @@ export const AppHeader = defineComponent({
   setup(props, { slots }) {
     return () => {
       return (
-        <div class="flex justify-start items-center">
+        <div class="flex justify-start items-center mt-4">
           <div class="text-[#CCCCCC] border-[3px] border-[#CCCCCC] rounded-full w-9 h-9 overflow-hidden flex justify-center items-center">
             <Icon type="user" class="w-10 h-10" />
           </div>
