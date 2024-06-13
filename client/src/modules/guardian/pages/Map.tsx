@@ -1,18 +1,19 @@
 import { useMapAPI } from "@/apis/map";
 import { useUserAPI } from "@/apis/user";
 import { AppHeader } from "@/components/AppHeader";
+import { FloorButtons } from "@/components/FloorButtons";
 import GuardianMapInteractive from "@/components/GuardianMapInteractive";
 import { Icon } from "@/components/Icon";
 import { Sidebar } from "@/components/Sidebar";
 import Spinner from "@/components/Spinner";
 import { usePosition } from "@/composables/position";
-import { useSignal } from "@/composables/signal";
+import { useMockSignal } from "@/composables/signal.mock";
 import { useSocket } from "@/composables/socket";
-import { AdminRoute, GuardianRoute } from "@/routers/route";
+import { GuardianRoute } from "@/routers/route";
 import { useAuthStore } from "@/stores/auth";
 
-import { defineComponent, onUnmounted, reactive } from "vue";
-import { RouterLink, useRouter } from "vue-router";
+import { computed, defineComponent, onUnmounted, reactive, ref } from "vue";
+import { useRouter } from "vue-router";
 import { Building } from "~/entities/map";
 import { Event, NotificationLevel } from "~/entities/message";
 import { User } from "~/entities/user";
@@ -33,8 +34,8 @@ export default defineComponent({
     const { listUsers } = useUserAPI();
     const { findBuilding } = useMapAPI();
 
-    const singnal = useSignal();
-    // const singnal = useMockSignal();
+    //const singnal = useSignal();
+    const singnal = useMockSignal();
     const position = usePosition();
     const socket = useSocket();
 
@@ -137,15 +138,48 @@ export default defineComponent({
 
     onUnmounted(() => state.unmountedHook());
 
+    // TODO: 층 표시
+    // 층별 정보 가져오기
+    // 층 정보 바뀌면 값 넣기
+
+    const defaultId = "default_id"; // 현재 내 위치로 돌아오는 버튼의 id
+    const showedFloorId = ref<string | undefined>();
+
+    const floorMap = computed(() =>
+      state.building?.floors.map((floor) => ({
+        id: floor.floorId,
+        label: floor.floorName,
+      }))
+    );
+
+    const floorButtonClick = (floorId: string) => {
+      if (floorId === defaultId) {
+        showedFloorId.value = undefined;
+      } else {
+        showedFloorId.value = floorId;
+      }
+    };
+
     return () => {
       return (
         <div class="flex flex-col h-full">
-          <RouterLink to={{ name: AdminRoute.MEASURE }}>측정</RouterLink>
+          {/* <RouterLink to={{ name: AdminRoute.MEASURE }}>측정</RouterLink> */}
           <AppHeader name={authStore.context.user?.name ?? ""}>
             <button onClick={() => (state.showSidebar = true)}>
               <Icon type="bars" class="w-8 h-8" />
             </button>
           </AppHeader>
+          <FloorButtons
+            floors={
+              floorMap.value
+                ? [
+                    ...[{ id: defaultId, label: "현재 위치" }],
+                    ...floorMap.value,
+                  ]
+                : [{ id: defaultId, label: "현재 위치" }]
+            }
+            onData:clickData={floorButtonClick}
+          ></FloorButtons>
 
           <Sidebar
             show={state.showSidebar}
@@ -249,6 +283,7 @@ export default defineComponent({
                 children={Object.values(state.children)}
                 markerId={state.position}
                 target={state.target ? state.children[state.target] : undefined}
+                showedFloorId={showedFloorId.value}
               />
             ) : (
               <div>

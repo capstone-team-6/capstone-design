@@ -35,13 +35,23 @@ export default defineComponent({
       type: Object as PropType<{ name: string; markerId: string }>,
       required: false,
     },
+    showedFloorId: {
+      type: String,
+      required: false,
+    },
   },
   setup(props) {
-    const floorRef = computed(() =>
-      props.building.floors.find((floor) =>
-        floor.QRMarker.find((QRMarker) => QRMarker.markerId === props.markerId)
-      )
-    );
+    const floorRef = computed(() => {
+      return props.showedFloorId
+        ? props.building.floors.find(
+            (floor) => floor.floorId === props.showedFloorId
+          )
+        : props.building.floors.find((floor) =>
+            floor.QRMarker.find(
+              (QRMarker) => QRMarker.markerId === props.markerId
+            )
+          );
+    });
 
     const groupChild = computed(() => _.groupBy(props.children, "markerId"));
 
@@ -64,15 +74,24 @@ export default defineComponent({
 
         const ctx = canvasRef.value.getContext("2d");
 
-        const firstMarker = path.shift();
+        let firstMarker = path.shift();
 
         if (ctx && firstMarker) {
-          let p = findMarkerPosition(firstMarker);
+          let p;
+          while (firstMarker) {
+            p = findMarkerPosition(firstMarker);
+
+            if (p) {
+              break;
+            } else {
+              firstMarker = path.shift();
+            }
+          }
 
           ctx.clearRect(0, 0, canvasRef.value.width, canvasRef.value.height);
 
-          ctx.strokeStyle = "#E15C35";
-          ctx.lineWidth = 12;
+          ctx.strokeStyle = "#16537e";
+          ctx.lineWidth = 9;
 
           ctx.beginPath();
           p && ctx.moveTo(p.x, p.y);
@@ -93,15 +112,21 @@ export default defineComponent({
       if (!floorRef.value) {
         return undefined;
       }
-      const marker = floorRef.value.QRMarker.find(
+      const QRMarker = floorRef.value.QRMarker.find(
         (marker) => marker.markerId === markerId
       );
 
-      if (!marker) {
+      const nodeMarker = floorRef.value.nodeMarker.find(
+        (marker) => marker.markerId === markerId
+      );
+
+      if (QRMarker) {
+        return { x: QRMarker.xLocation, y: QRMarker.yLocation };
+      } else if (nodeMarker) {
+        return { x: nodeMarker.xLocation, y: nodeMarker.yLocation };
+      } else {
         return undefined;
       }
-
-      return { x: marker.xLocation, y: marker.yLocation };
     };
 
     const myPosition = computed(() => findMarkerPosition(props.markerId));
@@ -114,8 +139,9 @@ export default defineComponent({
       drawCanvas();
     });
 
+    // TODO: 반응성 잘 되었나..?
     watch(
-      () => props.target,
+      () => [props.target, props.showedFloorId],
       () => {
         drawCanvas();
       }
@@ -123,11 +149,39 @@ export default defineComponent({
 
     return () => (
       state.isLoading && <Spinner />,
-      (
+      props.showedFloorId ? (
         <div class="w-full h-full overflow-scroll relative">
           <MapComponet
             mapImageURL={floorRef.value ? floorRef.value.mapImageURL : ""}
-            startPosition={findMarkerPosition(props.markerId)}
+            onLoad:img={mapImgLoading}
+          >
+            <canvas ref={canvasRef} width={2600} height={860}></canvas>
+            {_.keys(groupChild.value).map((markerId) => {
+              const markerPosition = findMarkerPosition(markerId);
+
+              return (
+                markerPosition && (
+                  <UserMarker
+                    imageSrc={blueMarkerImgSrc}
+                    usersName={_.map(groupChild.value[markerId], "name")}
+                    position={markerPosition}
+                  ></UserMarker>
+                )
+              );
+            })}
+            {myPosition.value && (
+              <UserMarker
+                imageSrc={redMarkerImgSrc}
+                usersName={["[Me]"]}
+                position={myPosition.value}
+              ></UserMarker>
+            )}
+          </MapComponet>
+        </div>
+      ) : (
+        <div class="w-full h-full overflow-scroll relative">
+          <MapComponet
+            mapImageURL={floorRef.value ? floorRef.value.mapImageURL : ""}
             onLoad:img={mapImgLoading}
           >
             <canvas ref={canvasRef} width={2600} height={860}></canvas>
