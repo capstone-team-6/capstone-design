@@ -1,9 +1,6 @@
+import { AdminRoute } from "@/routers/route";
 import { RouteRecordRaw } from "vue-router";
 import Measure from "./pages/Measure";
-
-export enum AdminRoute {
-  MEASURE = "measure",
-}
 
 export const adminRoutes: RouteRecordRaw[] = [
   {

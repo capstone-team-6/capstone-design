@@ -43,4 +43,11 @@ export class UserController {
   ): Promise<UserAPI['pairUser']['response']> {
     return this.userService.pairUser(request.uid, body.target);
   }
+
+  @Post('list')
+  async listUsers(
+    @Body() body: UserAPI['listUsers']['body'],
+  ): Promise<UserAPI['listUsers']['response']> {
+    return this.userService.getUsers(body.ids);
+  }
 }

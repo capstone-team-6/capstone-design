@@ -40,10 +40,10 @@ export default defineComponent({
     return () => (
       <div
         ref={mapRef}
-        class="w-[2600px] h-[860px] bg-cover bg-center cursor-grab active:cursor-grabbing"
+        class="w-[2600px] h-[860px] bg-cover bg-center cursor-grab active:cursor-grabbing absolute"
         style={{
           backgroundImage: `url("${props.mapImageURL}")`,
-          transform: `translate(${position.value.x}px, ${position.value.y}px)`,
+          // transform: `translate(${position.value.x}px, ${position.value.y}px)`,
         }}
         onContextmenu={onContextMenu}
         onLoadstart={onImgLoadStart}

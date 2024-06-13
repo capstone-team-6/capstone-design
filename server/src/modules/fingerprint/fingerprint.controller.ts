@@ -18,19 +18,16 @@ export class FingerprintController {
 
   @Get('find')
   async find(
-    @Query() querys: QueryType<FingerprintAPI['find']>,
-  ): Promise<FingerprintAPI['find']['response']> {
+    @Query() querys: QueryType<FingerprintAPI['list']>,
+  ): Promise<FingerprintAPI['list']['response']> {
     const result = this.fingerprintService.find(querys);
     return result;
   }
 
-  @Post('find-position')
-  async findPosition(
-    @Body() body: FingerprintAPI['findPosition']['body'],
-  ): Promise<FingerprintAPI['findPosition']['response']> {
-    return this.fingerprintService.findNearestMarker(
-      body.buildingId,
-      body.signals,
-    );
+  @Post('find-building')
+  async findBuilding(
+    @Body() body: FingerprintAPI['findBuilding']['body'],
+  ): Promise<FingerprintAPI['findBuilding']['response']> {
+    return this.fingerprintService.findBuilding(body.apList);
   }
 }

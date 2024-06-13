@@ -26,30 +26,30 @@ export default defineComponent({
         {building.value && (
           <GuardianMapInteractive
             building={building.value}
-            childs={[
+            children={[
               {
-                childName: "ss",
-                childMarkerId: "43ab8ea5-d638-455a-a6c0-167413bffd88",
+                name: "ss",
+                markerId: "43ab8ea5-d638-455a-a6c0-167413bffd88",
               },
               {
-                childName: "sa",
-                childMarkerId: "64f77ed5-2e84-4cb0-b042-2325770e630a",
+                name: "sa",
+                markerId: "64f77ed5-2e84-4cb0-b042-2325770e630a",
               },
               {
-                childName: "cs",
-                childMarkerId: "43ab8ea5-d638-455a-a6c0-167413bffd88",
+                name: "cs",
+                markerId: "43ab8ea5-d638-455a-a6c0-167413bffd88",
               },
             ]}
-            myMarkerId="156b576e-0ac4-4764-b2ac-aaa2ce8e4188"
+            markerId="156b576e-0ac4-4764-b2ac-aaa2ce8e4188"
             target={
               change.value
                 ? {
-                    childName: "ss",
-                    childMarkerId: "9775fe54-131e-43cd-bdca-ae1f2429c712",
+                    name: "ss",
+                    markerId: "9775fe54-131e-43cd-bdca-ae1f2429c712",
                   }
                 : {
-                    childName: "ss",
-                    childMarkerId: "43ab8ea5-d638-455a-a6c0-167413bffd88",
+                    name: "ss",
+                    markerId: "43ab8ea5-d638-455a-a6c0-167413bffd88",
                   }
             }
           />

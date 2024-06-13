@@ -1,7 +1,7 @@
-import { CommonRoute } from "@/modules/common/routes";
 import { firebaseApp } from "@/utils/firebase";
 import { getAuth } from "firebase/auth";
 import { NavigationGuard } from "vue-router";
+import { CommonRoute } from "./route";
 
 export const authGuard: NavigationGuard = async (to, _, next) => {
   const auth = getAuth(firebaseApp);

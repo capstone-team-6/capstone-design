@@ -1,126 +1,102 @@
-import { useFingerprintAPI } from "@/apis/fingerprint";
-import SignalInfo from "@/components/SignalInfo";
+import { useMapAPI } from "@/apis/map";
+import { useUserAPI } from "@/apis/user";
+import { AppHeader } from "@/components/AppHeader";
+import Spinner from "@/components/Spinner";
+import { usePosition } from "@/composables/position";
 import { useSignal } from "@/composables/signal";
-import { defineComponent, onUnmounted, reactive } from "vue";
-import { useRouter } from "vue-router";
-import { APSignal, Fingerprint } from "~/entities/fingerprint";
-import { AdminRoute } from "../admin/routes";
+import { useSocket } from "@/composables/socket";
+import { AdminRoute } from "@/routers/route";
+import { useAuthStore } from "@/stores/auth";
+import { defineComponent, reactive } from "vue";
+import { RouterLink } from "vue-router";
+import { User } from "~/entities/user";
+
+enum State {
+  SOCKET = "서버와 연결 중입니다.",
+  FIND_POSITION = "신호 수집 중입니다.",
+  FIND_BUILDING = "위치 정보를 받아오는 중입니다.",
+  INIT = "",
+}
 
 export default defineComponent({
   name: "Child",
   setup() {
+    const authStore = useAuthStore();
+    const { listUsers } = useUserAPI();
+    const { findBuilding } = useMapAPI();
+
+    const { get, subscribe } = useSignal();
+    // const { get, subscribe } = useMockSignal(true);
+
+    const { init, findPosition } = usePosition();
+    const socket = useSocket();
+
     const state = reactive({
-      signals: [] as APSignal[],
-      fingerprints: [] as Fingerprint[],
-      position: "??2?",
-      distance: 0,
-    });
-    const { subscribe } = useSignal();
-    const { find } = useFingerprintAPI();
-
-    find({ buildingId: "home" }, {}).then((result) => {
-      if (result.success) state.fingerprints = result.data;
+      guardian: [] as User[],
+      position: "",
+      state: State.SOCKET,
     });
 
-    const { isLoading, unsubscribe } = subscribe(async (signals) => {
-      state.signals = signals;
+    Promise.all([
+      listUsers({}, {}, { ids: authStore.context.user!.group }).then(
+        (result) => {
+          if (!result.success) {
+            throw new Error(result.message);
+          }
 
-      const { distance, position } = findPosition(
-        state.signals,
-        state.fingerprints
-      );
+          state.guardian = result.data;
+        }
+      ),
+      socket.init(),
+    ])
+      .then(() => (state.state = State.FIND_POSITION))
+      .then(() => get())
+      .then((signals) => {
+        state.state = State.FIND_BUILDING;
+        return init(signals);
+      })
+      .then((buildingId) => findBuilding({ buildingId }, {}))
+      .then((result) => {
+        if (!result.success) {
+          throw new Error(result.message);
+        }
+        const building = result.data;
 
-      state.distance = distance;
-      state.position = position;
-    }, 3000);
+        subscribe((signals) =>
+          findPosition(signals).then((markerId) => {
+            socket.send({
+              event: "position",
+              data: { buildingId: building.buildingId, markerId },
+            });
 
-    onUnmounted(() => {
-      unsubscribe();
-    });
-
-    const router = useRouter();
+            state.position = markerId + Math.random().toFixed(2);
+          })
+        );
+      })
+      .then(() => (state.state = State.INIT))
+      .catch((e) => alert(e));
 
     return () => {
       return (
         <div>
-          <button onClick={() => router.push({ name: AdminRoute.MEASURE })}>
-            수집
-          </button>
-          <div>{isLoading.value && <div>로딩 중</div>}</div>
-          <div class="flex">
-            <div>위치</div>
-            <div>{state.position}</div>
-          </div>
-          <div class="flex">
-            <div>거리</div>
-            <div>{state.distance}</div>
-          </div>
-          <div>
-            {state.signals.map((signal) => (
-              <SignalInfo signal={signal} />
-            ))}
+          <RouterLink to={{ name: AdminRoute.MEASURE }}>측정</RouterLink>
+          <AppHeader name={authStore.context.user?.name ?? ""} />
+          <div class="mt-12 font-semibold">
+            {state.state === State.INIT ? (
+              <div>
+                <div>{state.position}</div>
+                <div class="text-2xl">연결된 목록</div>
+
+                {state.guardian.map((user) => (
+                  <div class="text-xl">{user.name}</div>
+                ))}
+              </div>
+            ) : (
+              <Spinner label={state.state} />
+            )}
           </div>
         </div>
       );
     };
   },
 });
-
-const findPosition = (
-  signals: APSignal[],
-  fingerprints: Fingerprint[]
-): { position: string; distance: number } => {
-  const idSet = new Set<string>([
-    ...signals.map((signal) => signal.BSSID),
-    // ...fingerprints
-    //   .map((fingerprint) => fingerprint.signals.map((signal) => signal.BSSID))
-    //   .flat(),
-  ]);
-
-  const MIN_RSSI = -100 as const;
-  const result = fingerprints
-    .map((fingerprint) => {
-      let distance = 0;
-
-      idSet.forEach((id) => {
-        const a =
-          fingerprint.signals.find((signal) => signal.BSSID === id)?.level ??
-          MIN_RSSI;
-        const b =
-          signals.find((signal) => signal.BSSID === id)!.level ?? MIN_RSSI;
-
-        console.log(a, b);
-        distance += Math.abs(a - b);
-      });
-
-      return {
-        distance,
-        markerId: fingerprint.markerId,
-      };
-    })
-    .sort((a, b) => a.distance - b.distance);
-  const K = 5;
-  const candidates = result.slice(0, K);
-
-  const map = new Map<string, number>();
-  candidates.forEach((e) => {
-    const t = map.get(e.markerId);
-
-    if (t !== undefined) map.set(e.markerId, t + 1);
-    else map.set(e.markerId, 0);
-  });
-
-  let nearest = "??";
-  let cnt = 0;
-  map.forEach((value, key) => {
-    if (value > cnt) {
-      cnt = value;
-      nearest = key;
-    }
-  });
-
-  return {
-    distance: result[0].distance,
-    position: nearest,
-  };
-};

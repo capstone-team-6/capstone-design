@@ -1,8 +1,10 @@
 import { useUserAPI } from "@/apis/user";
+import { ChlidRoute, GuardianRoute } from "@/routers/route";
 import { firebaseApp } from "@/utils/firebase";
 import { GoogleAuthProvider, getAuth, signInWithRedirect } from "firebase/auth";
 import { defineStore } from "pinia";
 import { ref } from "vue";
+import { useRouter } from "vue-router";
 import { User } from "~/entities/user";
 
 type State =
@@ -19,6 +21,8 @@ export const useAuthStore = defineStore("user", () => {
 
   const auth = getAuth(firebaseApp);
   const googleProvider = new GoogleAuthProvider();
+
+  const router = useRouter();
 
   function init() {
     auth.onAuthStateChanged(async (user) => {
@@ -52,7 +56,21 @@ export const useAuthStore = defineStore("user", () => {
   }
 
   async function signUp(name: User["name"], type: User["type"]) {
-    return useUserAPI().signUp({}, {}, { name, type });
+    const result = await useUserAPI().signUp({}, {}, { name, type });
+    if (!result.success) {
+      throw Error(result.message);
+    }
+
+    context.value.state = "signIn";
+    context.value.user = result.data;
+
+    if (result.data.type === "guardian") {
+      return router.replace({ name: GuardianRoute.PAIR });
+    }
+
+    if (result.data.type === "child") {
+      return router.replace({ name: ChlidRoute.ID });
+    }
   }
 
   function signIn(provider: OauthProvider) {
@@ -65,11 +83,24 @@ export const useAuthStore = defineStore("user", () => {
     return auth.signOut();
   }
 
+  async function refreshUser() {
+    const oldUser = context.value.user;
+    if (oldUser === null) return;
+
+    const result = await useUserAPI().signIn({}, {});
+    if (!result.success) {
+      throw new Error(result.message);
+    }
+
+    context.value.user = result.data!;
+  }
+
   return {
     init,
     signUp,
     signIn,
     signOut,
+    refreshUser,
     context,
   };
 });

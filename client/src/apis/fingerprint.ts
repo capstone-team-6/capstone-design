@@ -6,15 +6,15 @@ export const useFingerprintAPI = () => {
     "/api/fingerprint/register",
     "POST"
   );
-  const find = makeAPI<FingerprintAPI["find"]>("/api/fingerprint/find", "GET");
-  const findPosition = makeAPI<FingerprintAPI["findPosition"]>(
-    "/api/fingerprint/find-position",
+  const find = makeAPI<FingerprintAPI["list"]>("/api/fingerprint/find", "GET");
+  const findBuilding = makeAPI<FingerprintAPI["findBuilding"]>(
+    "/api/fingerprint/find-building",
     "POST"
   );
 
   return {
     register,
     find,
-    findPosition,
+    findBuilding,
   };
 };

@@ -5,10 +5,12 @@ export const useUserAPI = () => {
   const signUp = makeAPI<UserAPI["signUp"]>("/api/user/sign-up", "POST");
   const signIn = makeAPI<UserAPI["signIn"]>("/api/user/sign-in", "GET");
   const pairUser = makeAPI<UserAPI["pairUser"]>("/api/user/pair", "POST");
+  const listUsers = makeAPI<UserAPI["listUsers"]>("/api/user/list", "POST");
 
   return {
     signUp,
     signIn,
     pairUser,
+    listUsers,
   };
 };

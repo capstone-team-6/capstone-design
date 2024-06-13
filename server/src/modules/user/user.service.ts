@@ -25,6 +25,10 @@ export class UserService {
     return user;
   }
 
+  async getUsers(ids: string[]): Promise<User[]> {
+    return this.db.users.find({ id: { $in: ids } }).toArray();
+  }
+
   async pairUser(a: string, b: string) {
     await this.db.withTransaction(async () => {
       const [userA, userB] = await Promise.all([

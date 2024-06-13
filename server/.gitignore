@@ -42,3 +42,8 @@ config/*
 # Ignore generated credentials from google-github-actions/auth
 gha-creds-*.json
 service-account.json
+
+ca.*
+*.key
+cert.*
+cert.key

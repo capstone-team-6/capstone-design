@@ -1,15 +1,10 @@
 import { AppButton } from "@/components/AppButton";
 import { useAuthStore } from "@/stores/auth";
-
 import { computed, defineComponent } from "vue";
-import {
-  LocationQueryValue,
-  RouterLink,
-  useRoute,
-  useRouter,
-} from "vue-router";
+import { RouterLink, useRoute, useRouter } from "vue-router";
 import { User } from "~/entities/user";
-import { CommonRoute } from "../routes";
+
+import { ChlidRoute, CommonRoute, GuardianRoute } from "@/routers/route";
 import { typeLabel } from "../utils/type";
 
 export default defineComponent({
@@ -27,8 +22,8 @@ export default defineComponent({
 
     authStore.$subscribe(
       (_, store) => {
-        const { state } = store.context;
-        console.log(state);
+        const { state, user } = store.context;
+
         if (state === "empty")
           return router.replace({
             name: CommonRoute.SIGN_UP,
@@ -36,8 +31,13 @@ export default defineComponent({
           });
 
         if (state === "signIn") {
-          const next = route.query.next as LocationQueryValue;
-          return router.replace(next ?? "/");
+          if (user.type === "child") {
+            return router.replace({ name: ChlidRoute.INDEX });
+          }
+
+          if (user.type === "guardian") {
+            return router.replace({ name: GuardianRoute.MAP });
+          }
         }
       },
       { immediate: true }
@@ -48,12 +48,23 @@ export default defineComponent({
         <div class="pt-48">
           <div class="flex items-center">
             <div class="text-2xl ml-2 font-semibold">
-              <span class="text-[#F35A0C]">{typeLabel[type.value]}</span>로
-              로그인하시겠습니까?
+              <span
+                class={[
+                  type.value === "guardian"
+                    ? "text-[#00B605]"
+                    : "text-[#F35A0C]",
+                ]}
+              >
+                {typeLabel[type.value]}
+              </span>
+              로 로그인하시겠습니까?
             </div>
           </div>
           <div class="mt-6">
-            <AppButton onClick={() => authStore.signIn("google")}>
+            <AppButton
+              onClick={() => authStore.signIn("google")}
+              class="!bg-white !border !border-black !text-black "
+            >
               구글 로그인
             </AppButton>
             <AppButton
@@ -70,7 +81,13 @@ export default defineComponent({
             }}
             class="mt-4 block text-center"
           >
-            <span class="text-[#F35A0C]">
+            <span
+              class={[
+                complementaryType.value === "guardian"
+                  ? "text-[#00B605]"
+                  : "text-[#F35A0C]",
+              ]}
+            >
               {typeLabel[complementaryType.value]}
             </span>
             로 로그인하기

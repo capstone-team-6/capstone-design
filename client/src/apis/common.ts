@@ -26,7 +26,7 @@ export function makeAPI<T extends Endpoint>(
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${idToken}`,
-          // "ngrok-skip-browser-warning": "true",
+          "ngrok-skip-browser-warning": "true",
         },
       }
     );

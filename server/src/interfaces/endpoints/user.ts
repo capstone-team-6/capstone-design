@@ -25,4 +25,13 @@ export type UserAPI = DefineAPI<{
     method: 'POST';
     response: void;
   };
+  listUsers: {
+    basePath: '/api/user';
+    path: 'list';
+    body: {
+      ids: User['id'][];
+    };
+    method: 'POST';
+    response: User[];
+  };
 }>;

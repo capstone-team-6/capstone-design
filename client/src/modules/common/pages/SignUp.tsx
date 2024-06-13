@@ -33,7 +33,7 @@ export default defineComponent({
               onInput={(value) => (input.name = value)}
             />
             <AppButton
-              class="bg-[#00B605] mt-4"
+              class={[type.value === "guardian" ? "!bg-[#00B605]" : "", "mt-4"]}
               onClick={() => authStore.signUp(input.name, type.value)}
             >
               확인
