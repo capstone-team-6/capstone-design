@@ -1,8 +1,10 @@
 import { ref } from "vue";
 import { APSignal } from "~/entities/fingerprint";
+import { useMockSignal } from "./signal.mock";
 
 export const useSignal = () => {
-  // if (window.isAndroid === undefined) return useMockSignal();
+  if (location.hostname === "127.0.0.1" || location.hostname === "localhost")
+    return useMockSignal();
 
   const scan = () => (window as any).Bridge.startScan();
 

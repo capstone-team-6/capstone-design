@@ -15,6 +15,7 @@
     "firebase": "^10.11.1",
     "lodash": "^4.17.21",
     "pinia": "^2.1.7",
+    "socket.io-client": "^4.7.5",
     "vue": "^3.3.11",
     "vue-qrcode": "2.2.2",
     "vue-qrcode-reader": "5.5.4",

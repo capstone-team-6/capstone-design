@@ -14,6 +14,7 @@ import { useAuthStore } from "@/stores/auth";
 import { defineComponent, onUnmounted, reactive } from "vue";
 import { RouterLink, useRouter } from "vue-router";
 import { Building } from "~/entities/map";
+import { Event } from "~/entities/message";
 import { User } from "~/entities/user";
 
 enum State {
@@ -90,9 +91,9 @@ export default defineComponent({
 
         state.building = result.data;
 
-        socket.subscribe<{ id: string; position: string }>((data) => {
-          state.children[data.id].markerId = data.position;
-          state.childSignals[data.id] = Date.now();
+        socket.subscribe(Event.POSITION, (data) => {
+          state.children[data.from.uid].markerId = data.markerId;
+          state.childSignals[data.from.uid] = Date.now();
           state.now = Date.now();
         });
 
@@ -101,7 +102,7 @@ export default defineComponent({
             state.position = markerId;
 
             socket.send({
-              event: "position",
+              event: Event.POSITION,
               data: {
                 buildingId: state.building!.buildingId,
                 markerId: state.position,
