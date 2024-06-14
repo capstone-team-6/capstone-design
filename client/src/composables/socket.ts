@@ -1,44 +1,52 @@
-import { useAuthStore } from "@/stores/auth";
+import { getAuth } from "firebase/auth";
+import { Manager } from "socket.io-client";
+import { Event, Message } from "~/entities/message";
 
-type Message = {
-  event: "position";
-  data: {
-    buildingId: string;
-    markerId: string;
-  };
-};
+const manager = new Manager(
+  import.meta.env.VITE_SERVER_URL.replace(/http|https/, "ws"),
+  {
+    closeOnBeforeunload: true,
+    autoConnect: false,
+  }
+);
+
+const socket = manager.socket("/");
 
 export const useSocket = () => {
-  const socket = new WebSocket(
-    import.meta.env.VITE_SERVER_URL.replace(/http|https/, "ws")
-  );
-  const authStore = useAuthStore();
+  const init = async () => {
+    if (socket.connected) return;
 
-  const init = (): Promise<void> => {
-    return new Promise((resolve) => {
-      socket.onopen = () => {
-        resolve();
-      };
-    });
-  };
-
-  const send = <T extends Message>(message: T) => {
-    socket.send(
-      JSON.stringify({
-        event: message.event,
-        data: {
-          id: authStore.context.user!.id,
-          target: authStore.context.user!.group,
-          ...message.data,
-        },
-      })
-    );
-  };
-
-  const subscribe = <T>(callback: (data: T) => any) => {
-    socket.onmessage = (event) => {
-      callback(JSON.parse(event.data));
+    const idToken = (await getAuth().currentUser?.getIdToken()) ?? "";
+    socket.auth = {
+      idToken,
     };
+
+    const promise = new Promise<void>((res) =>
+      socket.on("connect", () => res())
+    );
+    socket.connect();
+    await promise;
+  };
+
+  const send = <E extends Event, D extends Message[E]>(message: {
+    event: E;
+    data: D;
+  }) => {
+    socket.emit(message.event, message.data);
+  };
+
+  const sendWithAck = async <E extends Event, D extends Message[E]>(message: {
+    event: E;
+    data: D;
+  }) => {
+    return socket.emitWithAck(message.event, message.data);
+  };
+
+  const subscribe = <E extends Event>(
+    event: E,
+    callback: (data: Message[E], from: string) => any
+  ) => {
+    socket.on(event as string, callback);
   };
 
   const close = () => {
@@ -48,6 +56,7 @@ export const useSocket = () => {
   return {
     init,
     send,
+    sendWithAck,
     subscribe,
     close,
   };

@@ -11,7 +11,7 @@ export default defineComponent({
 
     return () => {
       return (
-        <div class="w-full max-w-sm mx-auto h-screen">
+        <div class="w-full p-2 mx-auto h-screen">
           {authStore.context.state === "init" ? (
             <Spinner label="로그인 정보 확인 중" class="mt-16" />
           ) : authStore.context.state === "check" ? (
