@@ -6,6 +6,9 @@ import Spinner from "@/components/Spinner";
 import { usePosition } from "@/composables/position";
 import { useSignal } from "@/composables/signal";
 import { useSocket } from "@/composables/socket";
+import level1 from "@/modules/child/assets/level1.mp3?url";
+import level2 from "@/modules/child/assets/level2.mp3?url";
+import level3 from "@/modules/child/assets/level3.mp3?url";
 import { AdminRoute } from "@/routers/route";
 import { useAuthStore } from "@/stores/auth";
 import { PropType, Teleport, defineComponent, reactive } from "vue";
@@ -165,6 +168,8 @@ const Popup = defineComponent({
       "보호자가 곧 도착할 예정입니다. 아이를 잠시 보호 해주세요",
     ];
 
+    const audioSrcs = [level1, level2, level3];
+
     return () => {
       return (
         <Teleport to="body">
@@ -208,6 +213,12 @@ const Popup = defineComponent({
             >
               확인
             </AppButton>
+            <audio
+              src={audioSrcs[props.level - 1]}
+              preload="auto"
+              loop
+              autoplay
+            ></audio>
           </div>
         </Teleport>
       );
