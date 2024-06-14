@@ -1,19 +1,21 @@
 import { getAuth } from "firebase/auth";
 import { Manager } from "socket.io-client";
-import { ClientMessage, Event, Message } from "~/entities/message";
+import { Event, Message } from "~/entities/message";
+
+const manager = new Manager(
+  import.meta.env.VITE_SERVER_URL.replace(/http|https/, "ws"),
+  {
+    closeOnBeforeunload: true,
+    autoConnect: false,
+  }
+);
+
+const socket = manager.socket("/");
 
 export const useSocket = () => {
-  const manager = new Manager(
-    import.meta.env.VITE_SERVER_URL.replace(/http|https/, "ws"),
-    {
-      closeOnBeforeunload: true,
-      autoConnect: false,
-    }
-  );
-
-  const socket = manager.socket("/");
-
   const init = async () => {
+    if (socket.connected) return;
+
     const idToken = (await getAuth().currentUser?.getIdToken()) ?? "";
     socket.auth = {
       idToken,
@@ -42,7 +44,7 @@ export const useSocket = () => {
 
   const subscribe = <E extends Event>(
     event: E,
-    callback: (data: ClientMessage[E]) => any
+    callback: (data: Message[E], from: string) => any
   ) => {
     socket.on(event as string, callback);
   };

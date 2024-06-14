@@ -1,6 +1,13 @@
 export enum Event {
   POSITION = 'position',
-  NOTICE = 'notice',
+  NOTIFICATION = 'notification',
+}
+
+export enum NotificationLevel {
+  CLEAR,
+  NOTICE,
+  WARNING,
+  EMERGENCY,
 }
 
 type DefineMessage<T extends Record<Event, any>> = T;
@@ -10,9 +17,8 @@ export type Message = DefineMessage<{
     buildingId: string;
     markerId: string;
   };
-  [Event.NOTICE]: {};
+  [Event.NOTIFICATION]: {
+    target: string;
+    level: NotificationLevel;
+  };
 }>;
-
-export type ClientMessage = {
-  [key in Event]: Message[key] & { from: { uid: string } };
-};

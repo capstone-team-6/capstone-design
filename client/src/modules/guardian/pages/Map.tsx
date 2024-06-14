@@ -14,7 +14,7 @@ import { useAuthStore } from "@/stores/auth";
 import { defineComponent, onUnmounted, reactive } from "vue";
 import { RouterLink, useRouter } from "vue-router";
 import { Building } from "~/entities/map";
-import { Event } from "~/entities/message";
+import { Event, NotificationLevel } from "~/entities/message";
 import { User } from "~/entities/user";
 
 enum State {
@@ -44,7 +44,10 @@ export default defineComponent({
 
       showSidebar: false,
       isInitiated: false,
-      children: {} as Record<User["id"], { markerId: string; name: string }>,
+      children: {} as Record<
+        User["id"],
+        { markerId: string; name: string; level: NotificationLevel }
+      >,
       childSignals: {} as Record<User["id"], null | number>,
 
       building: null as null | Building,
@@ -66,7 +69,9 @@ export default defineComponent({
             state.children[child.id] = {
               name: child.name,
               markerId: "",
+              level: NotificationLevel.CLEAR,
             };
+
             state.childSignals[child.id] = null;
           });
         }
@@ -91,10 +96,14 @@ export default defineComponent({
 
         state.building = result.data;
 
-        socket.subscribe(Event.POSITION, (data) => {
-          state.children[data.from.uid].markerId = data.markerId;
-          state.childSignals[data.from.uid] = Date.now();
+        socket.subscribe(Event.POSITION, (data, from) => {
+          state.children[from].markerId = data.markerId;
+          state.childSignals[from] = Date.now();
           state.now = Date.now();
+        });
+
+        socket.subscribe(Event.NOTIFICATION, (data, from) => {
+          state.children[from].level = data.level;
         });
 
         const { unsubscribe } = singnal.subscribe((signals) =>
@@ -152,10 +161,73 @@ export default defineComponent({
               {Object.entries(state.children).map(([id, child]) => (
                 <div class="py-2">
                   <div class="flex items-center justify-between">
-                    <div>{child.name}</div>
+                    <SmartButton
+                      onClick={async () => {
+                        if (state.childSignals[id] === null) return;
+
+                        child.level = Math.min(
+                          NotificationLevel.EMERGENCY,
+                          child.level + 1
+                        );
+
+                        socket.send({
+                          event: Event.NOTIFICATION,
+                          data: { target: id, level: child.level },
+                        });
+                      }}
+                      onPress={() => {
+                        child.level = NotificationLevel.CLEAR;
+                        socket.send({
+                          event: Event.NOTIFICATION,
+                          data: { target: id, level: child.level },
+                        });
+                      }}
+                      class="mr-4"
+                    >
+                      <Icon
+                        type="megaphone"
+                        class={[
+                          state.childSignals[id] === null
+                            ? "text-gray-500"
+                            : child.level === NotificationLevel.CLEAR
+                            ? ""
+                            : child.level === NotificationLevel.NOTICE
+                            ? "text-green-500"
+                            : child.level === NotificationLevel.WARNING
+                            ? "text-orange-500"
+                            : child.level === NotificationLevel.EMERGENCY
+                            ? "text-red-500"
+                            : "",
+                        ]}
+                      />
+                    </SmartButton>
+                    <div class="grow">
+                      <div>{child.name}</div>
+                      <div class="text-sm text-gray-500">
+                        {(() => {
+                          const lastSignal = state.childSignals[id];
+                          if (lastSignal === null) return "응답 없음";
+                          const elapsed = (state.now - lastSignal) / 1000;
+
+                          if (elapsed < 10) return "온라인";
+
+                          if (elapsed > 60) return "1분 이상";
+
+                          return elapsed.toFixed(0) + "초 전";
+                        })()}
+                      </div>
+                    </div>
                     <div
-                      class={[state.target === id ? "text-red-500" : ""]}
+                      class={[
+                        state.childSignals[id] === null
+                          ? "text-gray-500"
+                          : state.target === id
+                          ? "text-red-500"
+                          : "",
+                      ]}
                       onClick={() => {
+                        if (state.childSignals[id] === null) return;
+
                         state.target === id
                           ? (state.target = null)
                           : (state.target = id);
@@ -165,19 +237,6 @@ export default defineComponent({
                     >
                       <Icon type="marker" />
                     </div>
-                  </div>
-                  <div class="text-sm text-gray-500">
-                    {(() => {
-                      const lastSignal = state.childSignals[id];
-                      if (lastSignal === null) return "응답 없음";
-                      const elapsed = (state.now - lastSignal) / 1000;
-
-                      if (elapsed < 10) return "온라인";
-
-                      if (elapsed > 60) return "1분 이상";
-
-                      return elapsed.toFixed(0) + "초 전";
-                    })()}
                   </div>
                 </div>
               ))}
@@ -197,6 +256,48 @@ export default defineComponent({
               </div>
             )}
           </div>
+        </div>
+      );
+    };
+  },
+});
+
+const SmartButton = defineComponent({
+  emits: {
+    click: () => true,
+    press: () => true,
+  },
+  setup(_, { emit, slots }) {
+    const THRESHOLD = 1000;
+
+    const state = reactive({
+      handle: null as NodeJS.Timeout | null,
+    });
+
+    const start = () => {
+      state.handle = setTimeout(() => {
+        emit("press");
+        state.handle = null;
+      }, THRESHOLD);
+    };
+
+    const end = () => {
+      if (state.handle != null) {
+        clearTimeout(state.handle);
+        state.handle = null;
+        emit("click");
+      }
+    };
+
+    return () => {
+      return (
+        <div
+          onMousedown={start}
+          onTouchstart={start}
+          onMouseup={end}
+          onTouchend={end}
+        >
+          {slots.default?.()}
         </div>
       );
     };

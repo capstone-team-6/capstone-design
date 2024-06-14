@@ -18,7 +18,6 @@ import { UserService } from './user.service';
 export class UserGateway implements OnGatewayInit {
   @WebSocketServer()
   server: Server;
-  // clients: Record<User['id'], { socket: Socket; position: string }>;
 
   constructor(
     @Inject(UserService) private userService: UserService,
@@ -27,9 +26,9 @@ export class UserGateway implements OnGatewayInit {
     // this.clients = {};
   }
 
-  afterInit(server: Server) {
+  afterInit() {
     // implement auth middleware
-    server.use(async (socket, next) => {
+    this.server.use(async (socket, next) => {
       const firebaseAuth = this.firebaseService.getAuth();
       const { idToken } = socket.handshake.auth;
 
@@ -51,12 +50,14 @@ export class UserGateway implements OnGatewayInit {
     });
   }
 
-  @SubscribeMessage('position')
+  @SubscribeMessage(Event.POSITION)
   async position(
     @MessageBody() data: Message[Event.POSITION],
     @ConnectedSocket() socket: Socket,
   ) {
     socket.data.position = data;
+
+    this.server.fetchSockets;
 
     const sockets = await this.server.fetchSockets();
     const groupSockets = sockets.filter((s) =>
@@ -64,19 +65,29 @@ export class UserGateway implements OnGatewayInit {
     );
 
     groupSockets.forEach((s) => {
-      s.emit(Event.POSITION, {
-        ...data,
-        from: { uid: socket.data.uid },
-      });
+      s.emit(Event.POSITION, data, socket.data.uid);
     });
 
-    return from(groupSockets)
-      .pipe(filter((s) => s.data.position !== undefined))
-      .pipe(
-        map((s) => ({
-          ...s.data.position,
-          from: { uid: s.data.uid },
-        })),
-      );
+    console.log(sockets.length);
+
+    return from(groupSockets).pipe(
+      filter((s) => s.data.position !== undefined),
+      map((s) => [s.data.position, s.data.uid]),
+    );
+  }
+
+  @SubscribeMessage(Event.NOTIFICATION)
+  async notification(
+    @MessageBody() data: Message[Event.NOTIFICATION],
+    @ConnectedSocket() socket: Socket,
+  ) {
+    const sockets = await this.server.fetchSockets();
+    const targetSocket = sockets.find((s) => s.data.uid === data.target);
+
+    if (!targetSocket) return false;
+
+    targetSocket.emit(Event.NOTIFICATION, data, socket.data.uid);
+
+    return true;
   }
 }
