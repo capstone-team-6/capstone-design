@@ -144,6 +144,9 @@ export default defineComponent({
       () => [props.target, props.showedFloorId],
       () => {
         drawCanvas();
+      },
+      {
+        deep: true,
       }
     );
 

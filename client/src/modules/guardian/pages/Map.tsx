@@ -330,7 +330,10 @@ const SmartButton = defineComponent({
           onMousedown={start}
           onTouchstart={start}
           onMouseup={end}
-          onTouchend={end}
+          onTouchend={(e) => {
+            e.preventDefault();
+            end();
+          }}
         >
           {slots.default?.()}
         </div>
