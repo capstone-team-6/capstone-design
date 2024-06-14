@@ -58,9 +58,9 @@ export default defineComponent({
           <img
             onMousedown={onMouseDown}
             src={props.imageSrc}
-            class="cursor-default hover:brightness-75 transition duration-300 ease-in-out -translate-x-1/2 -translate-y-full"
+            class="cursor-default hover:brightness-75 transition duration-300 ease-in-out -translate-x-1/2 -translate-y-1/2"
           />
-          <p class="bg-white px-2 -translate-x-9 -translate-y-16">
+          <p class="bg-white px-2 -translate-x-7 -translate-y-3">
             {props.marker.markerName}
           </p>
         </div>

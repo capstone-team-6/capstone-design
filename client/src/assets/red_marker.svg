@@ -1,9 +1,16 @@
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<!-- Uploaded to: SVG Repo, www.svgrepo.com, Transformed by: SVG Repo Mixer Tools -->
-<svg width="72px" height="72px" viewBox="0 0 1024 1024" class="icon" version="1.1" xmlns="http://www.w3.org/2000/svg" fill="#000000">
-<g id="SVGRepo_bgCarrier" stroke-width="0"/>
-<g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"/>
-<g id="SVGRepo_iconCarrier">
-<path d="M512 85.333333c-164.949333 0-298.666667 133.738667-298.666667 298.666667 0 164.949333 298.666667 554.666667 298.666667 554.666667s298.666667-389.717333 298.666667-554.666667c0-164.928-133.717333-298.666667-298.666667-298.666667z m0 448a149.333333 149.333333 0 1 1 0-298.666666 149.333333 149.333333 0 0 1 0 298.666666z" fill="#e32400"/>
-</g>
-</svg>
+
+<!-- Uploaded to: SVG Repo, www.svgrepo.com, Transformed by: SVG Repo Mixer Tools -->
+<svg fill="#77bb41" width="36px" height="36px" viewBox="0 0 48.00 48.00" xmlns="http://www.w3.org/2000/svg" style="enable-background:new 0 0 48 48" xml:space="preserve" transform="rotate(0)" stroke="#77bb41" stroke-width="0.00048000000000000007">
+
+<g id="SVGRepo_bgCarrier" stroke-width="0" transform="translate(2.3999999999999986,2.3999999999999986), scale(0.9)">
+
+<rect x="0" y="0" width="48.00" height="48.00" rx="24" fill="#ebebeb" strokewidth="0"/>
+
+</g>
+
+<g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"/>
+
+<g id="SVGRepo_iconCarrier"> <style>.st1{display:none}</style> <g id="Your_Icons"> <path style="fill:none" d="M0 0h48v48H0z"/> <path d="M24 40c-8.822 0-16-7.178-16-16S15.178 8 24 8s16 7.178 16 16-7.178 16-16 16z"/> </g> </g>
+
+</svg>

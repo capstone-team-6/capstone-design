@@ -120,24 +120,22 @@ export default defineComponent({
 
     return () => (
       <div>
-        {false && (
-          <div>
-            <p class="border-2 border-gray-300">
-              {markerMode.value === "QR" ? "QR mode" : "Node mode"}
-            </p>
-            <button
-              onClick={() => {
-                if (markerMode.value === "QR") {
-                  markerMode.value = "node";
-                } else {
-                  markerMode.value = "QR";
-                }
-              }}
-            >
-              Mode change
-            </button>
-          </div>
-        )}
+        <div>
+          <p class="border-2 border-gray-300">
+            {markerMode.value === "QR" ? "QR mode" : "Node mode"}
+          </p>
+          <button
+            onClick={() => {
+              if (markerMode.value === "QR") {
+                markerMode.value = "node";
+              } else {
+                markerMode.value = "QR";
+              }
+            }}
+          >
+            Mode change
+          </button>
+        </div>
         <MapComponet
           ref={mapRef}
           mapImageURL={floorRef.value ? floorRef.value.mapImageURL : ""}

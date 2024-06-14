@@ -27,10 +27,10 @@ export default defineComponent({
       >
         <img
           src={props.imageSrc}
-          class="transition duration-300 ease-in-out -translate-x-1/2 -translate-y-full"
+          class="transition duration-300 ease-in-out -translate-x-1/2 -translate-y-1/2"
         />
         {props.usersName.map((userName) => (
-          <p class="bg-white px-2 -translate-x-9 -translate-y-16">{userName}</p>
+          <p class="bg-white px-2 -translate-x-7 -translate-y-3">{userName}</p>
         ))}
       </div>
     );

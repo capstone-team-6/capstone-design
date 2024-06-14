@@ -10,6 +10,7 @@ export enum ChlidRoute {
 
 export enum AdminRoute {
   MEASURE = "measure",
+  MAP_ADMIN = "mapAdmin",
 }
 
 export enum GuardianRoute {

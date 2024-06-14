@@ -20,41 +20,38 @@ export default defineComponent({
 
     const change = ref(true);
 
-    return () => (
-      <div>
-        <button onClick={() => (change.value = !change.value)}>전환</button>
-        {building.value && (
-          <GuardianMapInteractive
-            building={building.value}
-            children={[
-              {
+    return () => {
+      return (
+        <div class="h-full">
+          <button onClick={() => (change.value = !change.value)}>전환</button>
+          {building.value && (
+            <GuardianMapInteractive
+              building={building.value}
+              children={[
+                {
+                  name: "ss",
+                  markerId: "43ab8ea5-d638-455a-a6c0-167413bffd88",
+                },
+                {
+                  name: "sa",
+                  markerId: "839fbbae-c52f-4f02-8be6-4a110995062e",
+                },
+                {
+                  name: "cs",
+                  markerId: "156b576e-0ac4-4764-b2ac-aaa2ce8e4188",
+                },
+              ]}
+              markerId={
+                change.value ? "156b576e-0ac4-4764-b2ac-aaa2ce8e4188" : "839fbbae-c52f-4f02-8be6-4a110995062e"
+              }
+              target={{
                 name: "ss",
-                markerId: "43ab8ea5-d638-455a-a6c0-167413bffd88",
-              },
-              {
-                name: "sa",
-                markerId: "64f77ed5-2e84-4cb0-b042-2325770e630a",
-              },
-              {
-                name: "cs",
-                markerId: "43ab8ea5-d638-455a-a6c0-167413bffd88",
-              },
-            ]}
-            markerId="156b576e-0ac4-4764-b2ac-aaa2ce8e4188"
-            target={
-              change.value
-                ? {
-                    name: "ss",
-                    markerId: "9775fe54-131e-43cd-bdca-ae1f2429c712",
-                  }
-                : {
-                    name: "ss",
-                    markerId: "43ab8ea5-d638-455a-a6c0-167413bffd88",
-                  }
-            }
-          />
-        )}
-      </div>
-    );
+                markerId: "9775fe54-131e-43cd-bdca-ae1f2429c712",
+              }}
+            />
+          )}
+        </div>
+      );
+    };
   },
 });
