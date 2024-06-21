@@ -9,10 +9,8 @@ import { useSocket } from "@/composables/socket";
 import level1 from "@/modules/child/assets/level1.mp3?url";
 import level2 from "@/modules/child/assets/level2.mp3?url";
 import level3 from "@/modules/child/assets/level3.mp3?url";
-import { AdminRoute } from "@/routers/route";
 import { useAuthStore } from "@/stores/auth";
 import { PropType, Teleport, defineComponent, reactive } from "vue";
-import { RouterLink } from "vue-router";
 import { Event, NotificationLevel } from "~/entities/message";
 import { User } from "~/entities/user";
 
@@ -120,7 +118,6 @@ export default defineComponent({
 
       return (
         <div>
-          <RouterLink to={{ name: AdminRoute.MEASURE }}>측정</RouterLink>
           <AppHeader name={authStore.context.user?.name ?? ""} />
           <div class="mt-12 font-semibold">
             {state.state === State.INIT ? (

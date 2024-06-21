@@ -141,7 +141,7 @@ export default defineComponent({
 
     // TODO: 반응성 잘 되었나..?
     watch(
-      () => [props.target, props.showedFloorId],
+      () => [props.target, props.showedFloorId, props.markerId],
       () => {
         drawCanvas();
       },

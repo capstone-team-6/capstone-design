@@ -7,7 +7,7 @@ import { Icon } from "@/components/Icon";
 import { Sidebar } from "@/components/Sidebar";
 import Spinner from "@/components/Spinner";
 import { usePosition } from "@/composables/position";
-import { useMockSignal } from "@/composables/signal.mock";
+import { useSignal } from "@/composables/signal";
 import { useSocket } from "@/composables/socket";
 import { GuardianRoute } from "@/routers/route";
 import { useAuthStore } from "@/stores/auth";
@@ -34,8 +34,7 @@ export default defineComponent({
     const { listUsers } = useUserAPI();
     const { findBuilding } = useMapAPI();
 
-    //const singnal = useSignal();
-    const singnal = useMockSignal();
+    const singnal = useSignal();
     const position = usePosition();
     const socket = useSocket();
 
